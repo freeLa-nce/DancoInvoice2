@@ -1,0 +1,100 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css\style.css' %}">
+
+</head>
+
+<body>
+    <div class="container" id="container">
+        <div class="row">
+            <!-- Forgot Password Form -->
+            <div class="col-md-6 form-container sign-in-container">
+                <form action ="{% url 'checkUserForgot' %}" id="check-user-forgot-form" method="POST">
+
+                    {% csrf_token %}  <!-- Add CSRF Token for security -->
+                    <img src="{% static 'img/DANACO.png' %}" alt="" class="mb-4">
+                    <div class="form-group mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="check-forgot-email" name="check-forgot-email" class="form-control mb-2" placeholder="Enter your email" />
+                        <div class="invalid-feedback">Please enter a valid email address.</div>
+
+                    </div>
+                    <button type="submit" class="btn blue-btn mt-5" id="submit-email-btn">Submit</button>
+
+                    <a href="{% url 'login' %}" id="back-to-login-link" class="d-block mt-3">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Login
+                    </a>
+                </form>
+            </div>
+            
+        </div>
+
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-right">
+                    <h5>Streamline Your Orders from Invoice to Delivery</h5>
+                    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+                    <dotlottie-player src="https://lottie.host/b70ca053-4ee0-4a9b-b1e4-0304d9a4d505/NfURI6uXKf.json" background="transparent" speed="1" style="width: 350px; height: 350px;" loop autoplay></dotlottie-player>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://lottie.host/5da40bf1-867e-417e-ad44-1b63d4b82932/zn2Y8qg1M0.json"></script>
+    <script src="{% static 'js\forgot\forgot.js' %}"></script>
+    <script src="{% static 'js\danco.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css\libs\notiflix\notiflix.min.css' %}">
+    <script src="{% static 'js\libs\notiflix\notiflix-3.2.7.min.js' %}"></script>
+</body>
+
+<script id="messages" type="application/json">
+    {{ messages|json_script:"messages" }}
+</script>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        debugger;
+        // Get the content of the script tag by its ID
+        const scriptContent = document.getElementById('messages').textContent.trim();
+        const messages = extractMessagesFromContent(scriptContent);
+        // Parse the content as JSON
+        if(messages != "" || messages != []){
+        // Now process the messages and display them using Notiflix
+            messages.forEach(msg => {
+                const messageText = msg.message;
+                const messageTag = msg.tags;  // 'success', 'error', etc.
+
+                if (messageTag.includes('success')) {
+                    SuccessAlert(messageText);
+                    setTimeout(() => {
+                        window.location.href = '{% url "forgot_otp" %}';
+                    }, 2000); // Adjust the delay as needed
+                } else if (messageTag.includes('error')) {
+                    ErrorAlert(messageText);
+                } else if (messageTag.includes('warning')) {
+                    WarningAlert(messageText);
+                } else {
+                    InfoAlert(messageText);
+                }
+            });
+        }
+        
+
+        
+    });
+</script>
+
+</html>

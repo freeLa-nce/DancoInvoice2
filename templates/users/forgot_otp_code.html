@@ -1,0 +1,196 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Code</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css\style.css' %}">
+    <style>
+        .hide-error{
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="container">
+        <div class="row">
+            <div class="col-md-6 form-container sign-in-container" id="enter-code-form">
+                <form action ="{% url 'check_forgot_password_otp' %}" id="check-forgot-password-otp-form" method="POST">
+                    {% csrf_token %}
+                    <img src="{% static 'img\DANACO.png' %}" alt="" class="mb-4">
+                
+                    <div class="form-group mb-3">
+                        <label for="code" class="form-label">Enter Code</label>
+                        <div class="d-flex justify-content-between">
+                            <input type="text" id="code1" name="code1" class="form-control code-input" maxlength="1" inputmode="numeric" />
+                            <input type="text" id="code2" name="code2" class="form-control code-input" maxlength="1" inputmode="numeric" />
+                            <input type="text" id="code3" name="code3" class="form-control code-input" maxlength="1" inputmode="numeric" />
+                            <input type="text" id="code4" name="code4" class="form-control code-input" maxlength="1" inputmode="numeric" />
+                            <input type="text" id="code5" name="code5" class="form-control code-input" maxlength="1" inputmode="numeric" />
+                            <input type="text" id="code6" name="code6" class="form-control code-input" maxlength="1" inputmode="numeric" />
+                        </div>
+                        <div class="invalid-feedback d-flex hide-error" id="forgot-pass-otp-error">Please enter correct otp. Otp must be of 6 digits</div>
+
+                    </div>
+                
+                    <div class="d-flex justify-content-center align-items-center">
+                        <p id="timer" class="my-3 mr-1">01:00</p>
+                        <button type="button" class="btn btn-link p-0" id="resend-code-btn" onclick="ResendForogotOtp(event)">Resend Code</button>
+                    </div>
+                    
+                    <button type="submit" class="btn blue-btn mt-3" id="submit-code-btn">Continue</button>
+                </form>
+            </div>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-right">
+                    <h5>Streamline Your Orders from Invoice to Delivery</h5>
+                    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+                    <dotlottie-player src="https://lottie.host/b70ca053-4ee0-4a9b-b1e4-0304d9a4d505/NfURI6uXKf.json" background="transparent" speed="1" style="width: 350px; height: 350px;" loop autoplay></dotlottie-player>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://lottie.host/5da40bf1-867e-417e-ad44-1b63d4b82932/zn2Y8qg1M0.json"></script>
+    <!--<script src="{% static 'js\script.js' %}"></script>
+    <script src="{% static 'js\pass.js'%}"></script> -->
+    <script src="{% static 'js\danco.js' %}"></script>
+
+    <script src="{% static 'js\time\time.js'%}"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'css\libs\notiflix\notiflix.min.css' %}">
+    <script src="{% static 'js\libs\notiflix\notiflix-3.2.7.min.js' %}"></script>
+    <!-- <script>
+        document.getElementById("submit-code-btn").addEventListener("click", function() {
+            window.location.href = "newpass.html"; // Redirect to newpass.html
+        });
+    </script> -->
+    
+</body>
+
+<script id="messages" type="application/json">
+    {{ messages|json_script:"messages" }}
+</script>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        debugger;
+        // Get the content of the script tag by its ID
+        const scriptContent = document.getElementById('messages').textContent.trim();
+        const messages = extractMessagesFromContent(scriptContent);
+        // Parse the content as JSON
+        if(messages != "" || messages != []){
+        // Now process the messages and display them using Notiflix
+            messages.forEach(msg => {
+                const messageText = msg.message;
+                const messageTag = msg.tags;  // 'success', 'error', etc.
+
+                if (messageTag.includes('success')) {
+                    SuccessAlert(messageText);
+                } else if (messageTag.includes('error')) {
+                    ErrorAlert(messageText);
+                } else if (messageTag.includes('warning')) {
+                    WarningAlert(messageText);
+                } else {
+                    InfoAlert(messageText);
+                }
+            });
+        }
+    });
+
+    $('#check-forgot-password-otp-form').on('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        debugger;
+        let isValid = true;
+        let otpCode = '';
+
+        // Remove previous invalid classes from all OTP input fields
+        $('.code-input').removeClass('is-invalid');
+
+        // Iterate through each OTP input field and gather the values
+        $('.code-input').each(function() {
+            const value = $(this).val();
+            
+            if (!value || !$(this)[0].checkValidity()) {
+                $(this).addClass('is-invalid');  // Mark as invalid if empty or invalid
+                isValid = false;
+            } else {
+                otpCode += value;  // Append the digit to the OTP code
+            }
+        });
+
+        // Regular expression to match exactly 6 numeric digits
+        const otpPattern = /^\d{6}$/;
+
+        // Check if the OTP matches the pattern (exactly 6 digits)
+        if (!otpPattern.test(otpCode)) {
+            isValid = false;
+            // Show the validation message (OTP must be 6 digits)
+            $('#forgot-pass-otp-error').removeClass('hide-error');
+        } else {
+            // Hide the validation message if OTP is valid
+            $('#forgot-pass-otp-error').addClass('hide-error');
+        }
+
+        // Proceed with form submission if valid
+        if (isValid) {
+            this.submit();  // Submit the form if everything is valid
+        }
+    });
+
+
+    function ResendForogotOtp(e) {
+        e.preventDefault();  // Prevent default form submission
+        // var email = document.getElementById("check-forgot-email").value();
+        // var formData = new FormData();
+        // formData.append("ForgotEmail", email);
+
+        $.ajax({
+
+            url: "{% url 'resend_forget_otp' %}",
+            type: "POST",
+            headers: {
+                'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()  // Include CSRF token in the header
+            },
+            cache: false,
+            success: function (data) {
+                // Handle success response
+                const messageText = data.message; // Extracting message
+                const messageTag = data.tags; // Extracting tags
+
+                // Check the tag and call the appropriate alert function
+                if (messageTag.includes('success')) {
+                    SuccessAlert(messageText);
+                    setTimeout(() => {
+                        window.location.href = '{% url "forgot_otp" %}'; // Redirect after a delay
+                    }, 2000); // Adjust the delay as needed
+                } else if (messageTag.includes('error')) {
+                    ErrorAlert(messageText);
+                } else if (messageTag.includes('warning')) {
+                    WarningAlert(messageText);
+                } else {
+                    InfoAlert(messageText);
+                }
+            },
+            error: function(textStatus, errorThrown) {
+                // Handle AJAX errors
+                ErrorAlert("An error occurred: " + textStatus);
+            }
+        });
+    }
+</script>
+
+
+</html>

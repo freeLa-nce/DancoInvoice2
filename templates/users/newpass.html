@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Password</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css\style.css' %}">
+</head>
+
+<body>
+    <div class="container" id="container">
+        <div class="row">
+            <div class="col-md-6 form-container sign-in-container" id="new-password-form">
+                <form action ="{% url 'forgot_password_change' %}" id="check-forgot-password-form" method="POST">
+                    {% csrf_token %}
+
+                    <img src="{% static 'img\DANACO.png' %}" alt="" class="mb-4">
+
+                    <div class="form-group mb-2 position-relative">
+                        <label for="new-password" class="form-label">New Password</label>
+                        <input type="password" id="new-password" name="new-password" class="form-control mb-2" placeholder="Please enter a password" maxlength="20" />
+                        <div class="invalid-feedback">Password must be at least 8 characters long.</div>
+                        <i class="fas fa-eye-slash toggle-icon" id="toggleNewPassword"></i>
+                    </div>
+
+                    <div class="form-group mb-2 position-relative">
+                        <label for="confirm-password" class="form-label">Confirm Password</label>
+                        <input type="password" id="confirm-password" name="confirm-password" class="form-control mb-2" placeholder="Please enter a password again" maxlength="20"/>
+                        <div class="invalid-feedback" >Password must be at least 8 characters long.</div>
+                        <i class="fas fa-eye-slash toggle-icon" id="toggleConfirmPassword"></i>
+                    </div>
+
+                    <button type="submit" class="btn blue-btn mt-3" id="save-password-btn">Save</button>
+                </form>
+            </div>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-right">
+                    <h5>Streamline Your Orders from Invoice to Delivery</h5>
+                    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+                    <dotlottie-player src="https://lottie.host/b70ca053-4ee0-4a9b-b1e4-0304d9a4d505/NfURI6uXKf.json" background="transparent" speed="1" style="width: 350px; height: 350px;" loop autoplay></dotlottie-player>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://lottie.host/5da40bf1-867e-417e-ad44-1b63d4b82932/zn2Y8qg1M0.json"></script>
+    <script src="{% static 'js\danco.js' %}"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'css\libs\notiflix\notiflix.min.css' %}">
+    <script src="{% static 'js\libs\notiflix\notiflix-3.2.7.min.js' %}"></script>
+    <script src="{% static 'js\password\pass.js'%}"></script>
+</body>
+
+
+<script id="messages" type="application/json">
+    {{ messages|json_script:"messages" }}
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        debugger;
+        // Get the content of the script tag by its ID
+        const scriptContent = document.getElementById('messages').textContent.trim();
+        const messages = extractMessagesFromContent(scriptContent);
+        // Parse the content as JSON
+        if(messages != "" || messages != []){
+        // Now process the messages and display them using Notiflix
+            messages.forEach(msg => {
+                const messageText = msg.message;
+                const messageTag = msg.tags;  // 'success', 'error', etc.
+
+                if (messageTag.includes('success')) {
+                    SuccessAlert(messageText);
+                    setTimeout(() => {
+                        window.location.href = '{% url "login" %}';
+                    }, 2000); // Adjust the delay as needed
+                } else if (messageTag.includes('error')) {
+                    ErrorAlert(messageText);
+                } else if (messageTag.includes('warning')) {
+                    WarningAlert(messageText);
+                } else {
+                    InfoAlert(messageText);
+                }
+            });
+        }
+    });
+
+    $('#check-forgot-password-form').on('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        debugger;
+        let isValid = true;
+        var newPass = $("#new-password").val()
+        var cnfmNewPass = $('#confirm-password').val();
+
+        // Check password length
+        // Validate new password length
+        if (newPass.length < 8) {
+            $('#new-password').next('.invalid-feedback').show(); // Show feedback for new password
+            isValid = false;
+        }
+
+        // Validate confirm password length
+        if (cnfmNewPass.length < 8) {
+            $('#confirm-password').next('.invalid-feedback').show(); // Show feedback for confirm password
+            isValid = false;
+        } 
+
+        if (newPass != cnfmNewPass && newPass.length != 0 && newPass.length != 0) {
+            $('#confirm-password').next('.invalid-feedback').show(); // Show feedback for confirm password
+        } else {
+            $('#new-password').next('.invalid-feedback').hide();
+            $('#confirm-password').next('.invalid-feedback').hide();
+        }
+
+        // Proceed with form submission if valid
+        if (isValid) {
+            this.submit();  // Submit the form if everything is valid
+        }
+        
+    });
+
+</script>
+
+</html>

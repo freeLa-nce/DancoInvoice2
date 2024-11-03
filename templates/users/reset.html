@@ -1,0 +1,310 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .disabled-eye {
+            opacity: 0.5;
+            pointer-events: none; /* Prevent interaction */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="container">
+        <div class="row">
+            <!-- New Password Form -->
+            <div class="col-md-6 form-container sign-in-container" id="new-password-form">
+                <form action ="{% url 'reset_password_change' %}" id="reset-password-form" method="POST">
+                    {% csrf_token %}
+
+                    <div class="text-center my-2">
+                        <img src="{% static 'img/DANACO.png' %}" alt="" class="logo-img">
+                    </div>
+
+                    <div class="form-group mb-1 position-relative">
+                        <label for="old-password" class="form-label">Old Password</label>
+                        <input type="password" id="reset-old-password" name="reset-old-password" class="form-control mb-2" placeholder="Enter your old password" oninput="CheckResetOldPassword()" />
+                        <div class="invalid-feedback" id="old-password-error"></div>
+                        <i class="fas fa-eye-slash toggle-icon" id="toggle-reset-old-password"></i>
+                    </div>
+                    <div class="form-group mb-1 position-relative">
+                        <label for="new-password" class="form-label">New Password</label>
+                        <input type="password" id="reset-new-password" name="reset-new-password" class="form-control mb-2" placeholder="Enter new password" oninput="CheckNewResetPassword()" disabled/>
+                        <div class="invalid-feedback" id="new-password-error"></div>
+                        <i class="fas fa-eye-slash toggle-icon" id="toggle-reset-new-password"></i>
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div class="form-group mb-1 position-relative">
+                        <label for="confirm-password" class="form-label">Confirm Password</label>
+                        <input type="password" id="reset-confirm-password" name="reset-cnfm-new-password" class="form-control mb-2" placeholder="Enter confirm new password" oninput="CheckConfirmNewResetPassword()" disabled/>
+                        <div class="invalid-feedback" id="new-cnfm-password-error"></div>
+                        <i class="fas fa-eye-slash toggle-icon" id="toggle-reset-confirm-password"></i>
+                    </div>
+                    <button type="submit" class="btn blue-btn mt-3" id="reset-password-btn">Save</button>
+                    <div class="text-center w-100 my-4">
+                        <a href="#enter-code-form" id="back" class="d-block mt-3"><i class="fas fa-arrow-left mr-2"></i>Back to Login</a>
+                    </div>
+             
+                </form>
+            </div>
+            <div class="overlay-container">
+                <div class="overlay">
+                    <div class="overlay-panel overlay-right">
+                        <h5>Streamline Your Orders from Invoice to Delivery</h5>
+                        <!-- <img src="./img/Modern VR technolgy with headset.png" alt="" class="img"> -->
+                        <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"
+                            type="module"></script>
+    
+                        <dotlottie-player src="https://lottie.host/b70ca053-4ee0-4a9b-b1e4-0304d9a4d505/NfURI6uXKf.json"
+                            background="transparent" speed="1" style="width: 350px; height: 350px;" loop
+                            autoplay></dotlottie-player>
+    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'css\libs\notiflix\notiflix.min.css' %}">
+    <script src="{% static 'js\libs\notiflix\notiflix-3.2.7.min.js' %}"></script>
+    <script src="{% static 'js\danco.js' %}"></script>
+</body>
+
+<script id="messages" type="application/json">
+    {{ messages|json_script:"messages" }}
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        debugger;
+        // Get the content of the script tag by its ID
+        const scriptContent = document.getElementById('messages').textContent.trim();
+        const messages = extractMessagesFromContent(scriptContent);
+        // Parse the content as JSON
+        if(messages != "" || messages != []){
+        // Now process the messages and display them using Notiflix
+            messages.forEach(msg => {
+                const messageText = msg.message;
+                const messageTag = msg.tags;  // 'success', 'error', etc.
+
+                if (messageTag.includes('success')) {
+                    SuccessAlert(messageText);
+                } else if (messageTag.includes('error')) {
+                    ErrorAlert(messageText);
+                } else if (messageTag.includes('warning')) {
+                    WarningAlert(messageText);
+                } else {
+                    InfoAlert(messageText);
+                }
+            });
+        }
+
+        DisableNewPasswordFields();
+    });
+
+    const toggleOldPassword = document.querySelector('#toggle-reset-old-password');
+    const oldPassword = document.querySelector('#reset-old-password');
+
+    toggleOldPassword.addEventListener('click', function () {
+
+        const type = oldPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        oldPassword.setAttribute('type', type);
+
+
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    const toggleResetNewPassword = document.querySelector('#toggle-reset-new-password');
+    const ResetNewPassword = document.querySelector('#reset-new-password');
+
+    toggleResetNewPassword.addEventListener('click', function () {
+
+        const type = ResetNewPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        ResetNewPassword.setAttribute('type', type);
+
+
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+
+
+    const toggleResetNewCnfmPassword = document.querySelector('#toggle-reset-confirm-password');
+    const ResetCnfmNewPassword = document.querySelector('#reset-confirm-password');
+
+    toggleResetNewCnfmPassword.addEventListener('click', function () {
+
+        const type = ResetCnfmNewPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        ResetCnfmNewPassword.setAttribute('type', type);
+
+
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    function DisableNewPasswordFields() {
+        $('#reset-new-password').prop('disabled', true);
+        $('#reset-confirm-password').prop('disabled', true);
+        
+        // Disable the eye icon by removing its click event
+        $('#toggle-reset-new-password').addClass('disabled-eye');
+        $('#toggle-reset-confirm-password').addClass('disabled-eye');
+    }
+
+    function EnableNewPasswordFields() {
+        $('#reset-new-password').prop('disabled', false);
+        $('#reset-confirm-password').prop('disabled', false);
+        
+        // Disable the eye icon by removing its click event
+        $('#toggle-reset-new-password').removeClass('disabled-eye');
+        $('#toggle-reset-confirm-password').removeClass('disabled-eye');
+    }
+
+    let isProcessing = false;  // Flag to prevent multiple hits
+
+    function CheckResetOldPassword() {
+        const password = $('#reset-old-password').val();
+        const errorMessage = $('#old-password-error');
+
+        // Check password length
+        if (password.length < 8 && password.length > 0) {
+            errorMessage.text('Old password cannot be less than 8 characters').show(); // Show message if less than 8 characters
+        } else if (password.length == 0) {
+            errorMessage.text('Please enter your old password').show(); // Show message if field is empty
+            DisableNewPasswordFields();
+        } else {
+            errorMessage.hide(); // Hide error if valid
+
+            if (password.length >= 8 && !isProcessing){
+                CheckUserOldPassword();
+            }
+        }
+    }
+
+
+    function CheckUserOldPassword(){
+        isProcessing = true;  // Set the flag to true when the request starts
+
+        $.ajax({
+            url: "{% url 'check_old_password' %}",
+            type: "POST",
+            headers: {
+                'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()  // Include CSRF token in the header
+            },
+            data: {
+                old_password: $('#reset-old-password').val()  // Sending the old password to the server
+            },
+            cache: false,
+            success: function (data) {
+                const messageText = data.message;
+                const messageTag = data.tags;
+
+                if(messageText == "Old password is correct"){
+                    EnableNewPasswordFields();
+                }
+                // Handle the response and call the appropriate alert function
+                else if (messageTag.includes('error')) {
+                    ErrorAlert(messageText);
+                    DisableNewPasswordFields()
+                }
+            },
+            error: function (textStatus, errorThrown) {
+                ErrorAlert("An error occurred: " + textStatus);
+            },
+            complete: function () {
+                isProcessing = false;  // Reset the flag when the request is complete
+            }
+        });
+    }
+
+
+    function CheckNewResetPassword(){
+        const password = $('#reset-new-password').val();
+        const errorMessage = $('#new-password-error');
+
+        // Check password length
+        if (password.length < 8 && password.length > 0) {
+            errorMessage.text('New password cannot be less than 8 characters').show(); // Show message if less than 8 characters
+        } 
+        else {
+            errorMessage.hide(); // Show message if field is empty
+            
+        }
+    }
+
+    function CheckConfirmNewResetPassword(){
+        const newPassword = $('#reset-new-password').val();
+        const cnfmPassword = $('#reset-confirm-password').val();
+        const errorMessage = $('#new-cnfm-password-error');
+
+        // Check password length
+        if (cnfmPassword.length < 8 && cnfmPassword.length > 0) {
+            errorMessage.text("");
+            errorMessage.text('Confirm password cannot be less than 8 characters').show(); // Show message if less than 8 characters
+        }
+        else if (cnfmPassword.length > 8 && newPassword != cnfmPassword) {
+            errorMessage.text("");
+            errorMessage.text('Confirm password does not match with new password').show(); // Show message if less than 8 characters
+        }
+        else {
+            errorMessage.hide(); // Show message if field is empty
+            
+        }
+    }
+
+    $('#reset-password-form').on('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        debugger;
+        let isValid = true;
+        var oldPassword = $('#reset-old-password').val();
+        var newPassword = $('#reset-new-password').val();
+        var cnfmPassword = $('#reset-confirm-password').val();
+
+        // Check password length
+        // Validate new password length
+        if (oldPassword.length < 8) {
+            $('#old-password-error').text('Please enter old password').show(); // Show feedback for new password
+            isValid = false;
+        }
+
+        if (newPassword.length < 8) {
+            $('#new-password-error').text('Please enter new password').show(); // Show feedback for new password
+            isValid = false;
+        }
+
+        // Validate confirm password length
+        if (cnfmPassword.length < 8) {
+            $('#new-cnfm-password-error').text('Please enter confirm password').show(); // Show feedback for confirm password
+            isValid = false;
+        } 
+
+        if (newPassword != cnfmPassword && newPassword.length != 0 && cnfmPassword.length != 0) {
+            $('#new-cnfm-password-error').text('Confirm password does not match with new password').show(); // Show feedback for confirm password
+            isValid = false;
+        } else {
+            $('#old-password-error').hide();
+            $('#new-password-error').hide();
+            $('#new-cnfm-password-error').hide();
+        }
+
+        // Proceed with form submission if valid
+        if (isValid) {
+            this.submit();  // Submit the form if everything is valid
+        }
+        
+    });
+</script>
+
+</html>
