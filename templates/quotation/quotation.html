@@ -12,6 +12,15 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+    <style>
+        .mb-0{
+            margin-bottom: 0px !important;
+        }
+
+        .me-2{
+            margin-right: 0.5rem !important;
+        }
+    </style>
 </head>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
@@ -39,7 +48,7 @@
                         </a>
                     </li>
                     <li class="nav-item mx-4">
-                        <a class="nav-link" href="customer.html">
+                        <a class="nav-link" href="{% url 'customer-view' %}">
                             <i class="fas fa-user" style="margin-right: 8px;"></i> Customer Data
                         </a>
                     </li>
@@ -88,35 +97,44 @@
                     </div>
                     
                     <p>Cecilia Chapman<br>711-2880 Nulla St.<br>Mankato Mississippi<br>96522<br>(257) 563-7401</p>
-                    <div class="form-group mb-2">
-                        <label for="invoice-date" class="sr-only">Date</label>
-                        <input type="date" class="form-control w-50" id="invoice-date" placeholder="Date">
+                    <div class="form-group mb-2 d-flex justify-content-end align-items-center">
+                        <label for="invoice-date"class="mb-0 me-2">Quotation Date: </label>
+                        <input type="date" class="form-control w-50" id="invoice-date" placeholder="Date" onchange="DisplayQuotationDate();">
                     </div>
-                    <div class="container-2 my-4" style="padding: 0px 40px 0px 40px; background-color: #F3F3F3;">
-                        <div id="input-container" class="mt-3">
-                            <div class="row mb-2 default-row">
-                                <div class="col-lg-5 mb-2">
-                                    <h6>Item</h6>
-                                    <input type="text" class="form-control-2" placeholder="Item Description"  required>
-                                </div>
-                                <div class="col-lg-3 mb-2">
-                                    <h6>Quantity</h6>
-                                    <input type="number" class="form-control-2" placeholder="Quantity"  required>
-                                </div>
-                                <div class="col-lg-3 mb-2">
-                                    <h6>Amount</h6>
-                                    <input type="number" class="form-control-2" placeholder="Price" required>
-                                </div>
-                                <div class="col-lg-1 mb-3 d-flex align-items-end">
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteRow(this)">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                    <div class="container-2 my-4" id="product-row-container" style="padding: 0px 40px 0px 40px; background-color: #F3F3F3;">
+                        <div class="add-product-row">
+                            <div id="input-container" class="mt-3">
+                                <div class="row mb-2 default-row">
+                                    <div class="col-lg-5 mb-2" id="item-product-div">
+                                        <h6>Item</h6>
+                                        <!-- <input type="text" class="form-control-2" placeholder="Item Description"  required> -->
+                                        <select class="form-control-2 item-description" id="item-description" data-placeholder="Item Description" style="width: 100%;" required></select>
+                                        <div class="invalid-feedback">Please select an item.</div>
+
+                                    </div>
+                                    <div class="col-lg-3 mb-2">
+                                        <h6>Quantity</h6>
+                                        <input type="number" class="form-control-2" placeholder="Quantity" id="item-quantity"  required>
+                                        <div class="invalid-feedback">Please enter a quantity.</div>
+
+                                    </div>
+                                    <div class="col-lg-3 mb-2">
+                                        <h6>Amount</h6>
+                                        <input type="number" class="form-control-2" placeholder="Price" id="item-price" required>
+                                        <div class="invalid-feedback">Please enter an amount.</div>
+
+                                    </div>
+                                    <div class="col-lg-1 mb-2 d-flex align-items-end">
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteRow(this)" disabled>
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col text-right">
-                                <button type="button" class="btn btn-primary my-2" id="add-row-btn">Add Product</button>
+                            <div class="row">
+                                <div class="col text-right">
+                                    <button type="button" class="btn btn-primary my-2" id="add-row-btn" onclick="addProductRow()">Add Product</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -140,8 +158,11 @@
                             <img src="{% static 'img/qr.png' %}" alt="QR Code" class="qr-code mr-3" style="height: 150px;width: 150px;">
                         </div>
                         <p class="my-2">Cecilia Chapman<br>711-2880 Nulla St.<br>Mankato Mississippi 96522<br>(257) 563-7401</p>
-                        <p><strong>Date:</strong> <span id="display-invoice-date"></span></p>
-                        <table class="table table-bordered">
+                        <p><strong>Date:</strong> <span id="display-invoice-date">--</span></p>
+                        <div class="table-responsive mb-1">
+
+                        </div>
+                        <table class="table table-bordered" id="invoice-table">
                             <thead>
                                 <tr>
                                     <th scope="col">Item Description</th>
@@ -150,14 +171,14 @@
                                     <th scope="col">Total</th>
                                 </tr>
                             </thead>
-                            <tbody id="invoice-table-body">
-                                <!-- Dynamically generated rows will go here -->
-                            </tbody>
+                            <!-- <tbody id="invoice-table-body">
+                           
+                            </tbody> -->
                         </table>
                         <p style="text-align: end;"><strong>Total Amount:</strong>
-                            KWD <span id="total-amount"></span></p>
+                            KWD <span id="total-amount">0</span></p>
                         <div class="button-group" style="position: absolute; bottom: 20px; right: 20px;">
-                            <button class="btn btn-success" id="print-invoice">Print Invoice</button>
+                            <button class="btn btn-success" id="print-invoice" onclick="PrintQuotation()">Print Quotation</button>
                         </div>
                     </div>
                 </div>
@@ -177,13 +198,20 @@
     <script src="{% static 'js\danco.js' %}"></script>
     <!-- <script src="{% static 'js/script.js' %}"></script> -->
 
+    <!-- Add these lines in the <head> section of your template -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap4.css">
 </body>
 
 <script id="messages" type="application/json">
     {{ messages|json_script:"messages" }}
 </script>
 
-
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap4.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -215,7 +243,281 @@
                 }
             });
         }
+
+        $('#invoice-table').DataTable({
+            data: [], // Empty data as no products are added initially
+            columns: [
+                { title: "Item Description" },
+                { title: "Quantity" },
+                { title: "Price" },
+                { title: "Total" }
+            ],
+            searching: false, // Disable searching
+            paging: false, // Disable pagination
+            destroy: true, // Destroy any previous instance before reinitialization
+            info: false,
+            language: {
+                emptyTable: "No products added" // Display message when table is empty
+            }
+        });
+
+
+        $('.item-description').select2({
+            placeholder: 'Search for an item',
+            minimumInputLength: 4,  // Trigger search after 4 characters
+            ajax: {
+                url: "{% url 'search_items' %}",  // URL for the search view
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        term: params.term  // Send the search term as a query parameter
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data  // Process results into Select2 format
+                    };
+                }
+            }
+        });
+
+        // Event listener for selecting an item from the list
+        $('.item-description').on('select2:select', function(e) {
+            var data = e.params.data;
+            $('#item-quantity').val(data.quantity);  // Populate the Quantity field
+            $('#item-price').val(data.price);   
+            $("#item-price").prop("disabled",true);     // Populate the Price field
+        });
+
+        
     });
+
+    function DisplayQuotationDate(){
+        const selectedDate = document.getElementById('invoice-date').value;
+        // document.getElementById('display-invoice-date').textContent = selectedDate;
+        if (selectedDate) { // Check if a date is selected
+            const [year, month, day] = selectedDate.split("-"); // Split the date into parts
+            const formattedDate = `${day}-${month}-${year}`; // Rearrange to dd-mm-yyyy
+            document.getElementById('display-invoice-date').textContent = formattedDate;
+        }
+    }
+
+    function addProductRow() {
+
+        let isValid = true;
+
+        // Check if each required field has a value
+        $('.default-row input, .default-row select').each(function() {
+            if (!$(this).val()) {
+                $(this).addClass('is-invalid'); // Add Bootstrap's invalid class
+                isValid = false;
+            } else {
+                $(this).removeClass('is-invalid'); // Remove invalid class if value exists
+            }
+        });
+
+        if (isValid) {
+
+
+            let itemDescription = $('#item-description').find(':selected').text();
+            let itemQuantity = parseFloat($('#item-quantity').val()) || 0;
+            let itemPrice = parseFloat($('#item-price').val()) || 0;
+            let itemTotal = itemQuantity * itemPrice;
+
+            var table;
+            // Check if DataTable has already been initialized
+            if (!$.fn.DataTable.isDataTable('#invoice-table')) {
+                table = $('#invoice-table').DataTable({
+                    destroy: true,
+                    searching: false,
+                    paging: true,
+                    lengthChange: false,
+                    info: false,
+                    pageLength: 5,
+                    scrollX: true,
+                });
+            } else {
+                table = $('#invoice-table').DataTable();
+            }
+
+             // Add row to DataTable
+            table.row.add([
+                itemDescription,
+                itemQuantity,
+                itemPrice.toFixed(2),
+                itemTotal.toFixed(2)
+            ]).draw();
+
+            //table.row.add(newData).draw(false); // 'false' means do not reset the paging
+            table.draw(); // This will redraw the entire DataTable and reset the paging
+            // Clone the first .default-row (the entire row)
+                    // Calculate and update the total amount
+            calculateTotalAmount();
+
+            var newRow = $('.default-row').first().clone();
+
+            // Clear the input values in the cloned row
+            clearRowInputs(newRow);
+
+            // Remove the Select2 container from the cloned row (if it exists)
+            newRow.find('#item-description').remove();  // Remove the Select2 wrapper
+
+            // Append the new select element
+            newRow.find('.col-lg-5').html(`
+                <select class="form-control-2 item-description" id="item-description" data-placeholder="Item Description" style="width: 100%;" required>
+                </select>
+            `);
+
+            // Initialize Select2 for the newly added select element in the cloned row
+            // Initialize Select2 with AJAX inside the cloned row
+            newRow.find('#item-description').select2({
+            placeholder: 'Search for an item',
+            minimumInputLength: 4,  // Trigger search after 4 characters
+            ajax: {
+                url: "{% url 'search_items' %}",  // URL for the search view
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        term: params.term  // Send the search term as a query parameter
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data  // Process results into Select2 format
+                    };
+                }
+            }
+            });
+
+            // Event listener for selecting an item from the list in the cloned row
+            newRow.find('#item-description').on('select2:select', function(e) {
+            var data = e.params.data;
+            newRow.find('#item-quantity').val(data.quantity);  // Populate the Quantity field in the cloned row
+            newRow.find('#item-price').val(data.price);        // Populate the Price field in the cloned row
+            });
+            // newRow.find('select').val(null).trigger('change');  // Reset the select2 dropdown
+
+            // Enable the delete button for the cloned row
+            enableDeleteButton(newRow);
+
+            // Append the cloned row to #input-container (last position)
+            $('#input-container').append(newRow);
+        }
+
+        // Initialize Select2 for the newly added row (only)
+        //initializeSelect2(newRow);
+
+        // Reinitialize Select2 on all previous rows (this prevents it from being lost)
+    // $('.select2').select2({
+    //     placeholder: 'Search for an item',
+    //     minimumInputLength: 4,
+    //     ajax: {
+    //         url: "{% url 'search_items' %}",
+    //         dataType: 'json',
+    //         delay: 250,
+    //         data: function(params) {
+    //             return {
+    //                 term: params.term
+    //             };
+    //         },
+    //         processResults: function(data) {
+    //             return {
+    //                 results: data
+    //             };
+    //         }
+    //     }
+    // });
+    }
+
+    // Function to clear input fields in a row
+    function clearRowInputs(row) {
+        row.find('input').val('');  // Clear the input fields
+        row.find('select').val(null).trigger('change');  // Reset Select2 field (if used)
+    }
+
+    // Function to enable the delete button for a cloned row
+    function enableDeleteButton(row) {
+        row.find('.btn-danger').prop('disabled', false);  // Enable the delete button
+    }
+
+    // Function to delete a row
+    function deleteRow(button) {
+        $(button).closest('.row').remove();  // Remove the row containing the delete button
+    }
+
+    
+
+// Function to calculate the total amount
+function calculateTotalAmount() {
+    let totalAmount = 0;
+
+    // Iterate over each row in the DataTable
+    $('#invoice-table').DataTable().rows().every(function() {
+        let data = this.data();
+        let rowTotal = parseFloat(data[3]); // Assuming 'Total' is in the fourth column
+        if (!isNaN(rowTotal)) {
+            totalAmount += rowTotal;
+        }
+    });
+
+    // Update the total amount display
+    $('#total-amount').text(totalAmount.toFixed(2));
+}
+
+function PrintQuotation(){
+// Select the invoice section
+    var invoiceContent = document.getElementById("invoice-preview").innerHTML;
+
+    // Collect product data from the table
+    let productData = [];
+    $('#invoice-table').DataTable().rows().every(function() {
+        let data = this.data();
+        let productName = data[0];   // Assuming the product name is in the first column
+        let productQuantity = parseInt(data[1]); // Assuming the quantity is in the second column
+        if (!isNaN(productQuantity)) {
+            productData.push({ name: productName, quantity: productQuantity });
+        }
+    });
+
+    // AJAX request to send product data to the server
+    $.ajax({
+        url: "{% url 'update-product-quantity' %}", // Server route for updating product quantity
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ products: productData }),
+        success: function(response) {
+            if (response.success) {
+                // Proceed to print after updating quantities
+                printInvoiceContent(invoiceContent);
+            } else {
+                ErrorAlert("Error updating product quantities. Please try again.");
+            }
+        },
+        error: function() {
+            ErrorAlert("Failed to connect to the server.");
+        }
+    });
+}
+
+
+// Function to open the print window and print the content
+function printInvoiceContent(invoiceContent) {
+var printWindow = window.open('', '', 'height=600,width=800');
+printWindow.document.write('<html><head><title>Print Invoice</title>');
+printWindow.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">');
+printWindow.document.write('<style>@media print { body { margin: 0; } }</style>');
+printWindow.document.write('</head><body>');
+printWindow.document.write(invoiceContent);
+printWindow.document.write('</body></html>');
+printWindow.document.close();
+
+printWindow.onload = function() {
+    printWindow.print();
+    printWindow.close();
+};
+}
 
 
 </script>

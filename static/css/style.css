@@ -216,12 +216,12 @@ form {
     color: #313131;
     font-weight: 400;
 }
-input {
-    padding: 8px 12px;
-    width: 100%;
-    background-color: #eee;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
+input,select {
+    padding: 8px 12px !important;
+    width: 100% !important;
+    background-color: #eee !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 4px !important;
     /* font-size: 10px; */
 }
 

@@ -88,7 +88,7 @@
                 </div> -->
                 <div class="col-12 d-flex justify-content-end">
                     <div class="col-3 d-flex justify-content-end"><button class="btn btn-primary" data-toggle="modal" data-target="#add-product-modal">Add Product</button></div>
-                    <div class="col-3"><button class="btn btn-primary">Download CSV</button></div>
+                    <div class="col-3"><button class="btn btn-primary" onclick="exportPatientTableToCSV('Productlist.csv')">Download CSV</button></div>
                 </div>
             </div>
             
@@ -434,7 +434,12 @@
                         {'data': 'Productid',
                             visible: false
                         },
-                        {'data': 'ProductId'},
+                        {
+                            'data': 'ProductId',
+                            'render': function(data, type, row) {
+                                return '#' + data; // Prepend # to ProductId
+                            }
+                        },
                         {'data': 'ProductName'},
                         {'data': 'Quantity' },
                         {'data': 'UnitPrice' },
@@ -541,17 +546,62 @@
             }
         });
 
+    }
+    function BindFormData(data){
+        $("#product-Id").val(data.Productid);
+        $("#edit-product-id").val(data.ProductId);
+        $("#edit-product-id").prop('disabled', true);
+        $("#edit-product-name").val(data.ProductName); 
+        $("#edit-quantity").val(data.Quantity);
+        $("#edit-unit").val(data.UnitPrice);
+    }
 
-
-        function BindFormData(data){
-            $("#product-Id").val(data.Productid);
-            $("#edit-product-id").val(data.ProductId);
-            $("#edit-product-id").prop('disabled', true);
-            $("#edit-product-name").val(data.ProductName); 
-            $("#edit-quantity").val(data.Quantity);
-            $("#edit-unit").val(data.UnitPrice);
+    function exportPatientTableToCSV(filename) {
+    //debugger;
+        var csv = [];
+        var headerRowData = [];
+        var headers = document.querySelectorAll("#product-datatable thead th");
+        // rows.forEach(function (header) {
+        //     headerRowData.push(header.innerText);
+        // });
+        for (var i = 0; i < headers.length - 1; i++) {
+            headerRowData.push(headers[i].innerText);
         }
+        csv.push(headerRowData.join(","));
 
+        var numberOfPages = $('#product-datatable').DataTable().page.info().pages;
+
+        for (var i = 0; i < numberOfPages; i++) {
+            $('#product-datatable').DataTable().page(i).draw('page');
+
+            // Extract data from the current page
+            var rows = document.querySelectorAll("#product-datatable tbody tr");
+            rows.forEach(function (row) {
+                var rowData = [];
+                var cells = row.querySelectorAll("td");
+                // cells.forEach(function (cell) {
+                //     rowData.push(cell.innerText.trim());
+                // });
+                for (var j = 0; j < cells.length - 1; j++) {
+                    rowData.push(cells[j].innerText.trim());
+                }
+                csv.push(rowData.join(","));
+            });
+        }
+        $('#product-datatable').DataTable().page(0).draw('page');
+        pdownload(filename, csv.join("\n"));
+    }
+    function pdownload(filename, text) {
+        var element = document.createElement("a");
+        element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(text));
+        element.setAttribute("download", filename);
+
+        element.style.display = "none";
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
     }
     </script>
   </body>

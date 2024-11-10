@@ -192,7 +192,7 @@ def check_user_forget(request):
                 otp = generate_otp()
                 try:
 #                   print("#############################################################################")
-#                   #send_otp_email(email, otp)
+                    send_otp_email(email, otp)
 #                   print("#############################################################################")
 #                   #messages.success(request, 'Password reset instructions have been sent to your email.')
 
@@ -209,44 +209,44 @@ def check_user_forget(request):
 
 
 
-def check_user_forget(request):
-    """Handles GET and POST requests for the forgot password functionality."""
-    message_list = []
+# def check_user_forget(request):
+#     """Handles GET and POST requests for the forgot password functionality."""
+#     message_list = []
 
-    # Check if there is an email stored in the session (similar to "Remember Me")
-    # if 'forgot_email' in request.session:
-    #     email = request.session.get('forgot_email')
-    # else:
-    #     email = ""
-    if request.method == 'POST':
-        email = request.POST.get('check-forgot-email')
-        request.session['check-forgot-email'] = email
-        # Find the user in the MongoDB collection
-        user = users_collection.find_one({"UserName": email})
+#     # Check if there is an email stored in the session (similar to "Remember Me")
+#     # if 'forgot_email' in request.session:
+#     #     email = request.session.get('forgot_email')
+#     # else:
+#     #     email = ""
+#     if request.method == 'POST':
+#         email = request.POST.get('check-forgot-email')
+#         request.session['check-forgot-email'] = email
+#         # Find the user in the MongoDB collection
+#         user = users_collection.find_one({"UserName": email})
 
-        if user:
-            if user.get('IsDeleted'):
-                message_list.append({'message': 'User is deleted. Cannot reset the password.', 'tags': 'error'})
-            elif user.get('IsBlocked'):
-                message_list.append({'message': 'User is blocked. Cannot reset the password.', 'tags': 'error'})
-            else:
-                otp = generate_otp()
-                try:
-#                   print("#############################################################################")
-#                   #send_otp_email(email, otp)
-#                   print("#############################################################################")
-#                   #messages.success(request, 'Password reset instructions have been sent to your email.')
+#         if user:
+#             if user.get('IsDeleted'):
+#                 message_list.append({'message': 'User is deleted. Cannot reset the password.', 'tags': 'error'})
+#             elif user.get('IsBlocked'):
+#                 message_list.append({'message': 'User is blocked. Cannot reset the password.', 'tags': 'error'})
+#             else:
+#                 otp = generate_otp()
+#                 try:
+# #                   print("#############################################################################")
+# #                   #send_otp_email(email, otp)
+# #                   print("#############################################################################")
+# #                   #messages.success(request, 'Password reset instructions have been sent to your email.')
 
-#                   # Insert OTP record into the MongoDB collection
-                    insert_forgot_password_otp(email, otp)
-                    message_list.append({'message': 'Password reset instructions have been sent to your email.', 'tags': 'success'})
-                    return redirect('forgot_otp_view')  # Replace with your URL name
-                except Exception as e:
-                    message_list.append({'message': f"Error sending email: {str(e)}", 'tags': 'error'})
-        else:
-            message_list.append({'message': 'Invalid username or password', 'tags': 'error'})
+# #                   # Insert OTP record into the MongoDB collection
+#                     insert_forgot_password_otp(email, otp)
+#                     message_list.append({'message': 'Password reset instructions have been sent to your email.', 'tags': 'success'})
+#                     return redirect('forgot_otp_view')  # Replace with your URL name
+#                 except Exception as e:
+#                     message_list.append({'message': f"Error sending email: {str(e)}", 'tags': 'error'})
+#         else:
+#             message_list.append({'message': 'Invalid username or password', 'tags': 'error'})
 
-    return render(request, 'users/forgot.html', {'messages': message_list})
+#     return render(request, 'users/forgot.html', {'messages': message_list})
 
 
 # Constants for resend logic
@@ -303,7 +303,7 @@ def resend_forget_otp(request):
 #               #send_otp_email(email, otp)
 #               print("#############################################################################")
 #               #messages.success(request, 'Password reset instructions have been sent to your email.')
-                # send_otp_email(email, otp)  # Uncomment to actually send the email
+                send_otp_email(email, otp)  # Uncomment to actually send the email
                 insert_forgot_password_otp(email, otp)  # Insert OTP record into MongoDB
                 
                 # Update session with the new resend attempt count and timestamp
@@ -368,26 +368,40 @@ def send_otp_email(recipient_email, otp):
         subject = "Your OTP for Password Reset"
         body = f"Your OTP for password reset is: {otp}. Please use this to reset your password."
 
-        smtp_server = config('SMTP_SERVER')
-        smtp_port = config('SMTP_PORT', cast=int)
-        smtp_username = config('SMTP_USERNAME')
-        smtp_password = config('SMTP_PASSWORD')
+        # smtp_server = config('SMTP_SERVER')
+        # smtp_port = config('SMTP_PORT', cast=int)
+        # smtp_username = config('SMTP_USERNAME')
+        # smtp_password = config('SMTP_PASSWORD')
 
         msg = MIMEText(body)
+        print(msg)
         msg['Subject'] = subject
-        msg['From'] = smtp_username
+        msg['From'] = settings.EMAIL_HOST_USER
+        print(msg['From'])
         msg['To'] = recipient_email
 
-        print(smtp_username)
-        print(smtp_password)
+        # print(smtp_username)
+        # print(smtp_password)
         
+        # with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as server:
+        #     server.starttls()  # Secure the connection
 
-        with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
+        #     print("Logging in to the SMTP server...")
+        #     server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+        #     print(f"Sending email to {recipient_email}...")
+        #     server.sendmail(settings.EMAIL_HOST_USER, recipient_email, msg.as_string())
+        #     print(f"Email sent successfully to {recipient_email}")
+        print(settings.EMAIL_HOST)
+        print(settings.EMAIL_PORT)
+        with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as server:
+            server.starttls()  # Secure the connection
             print("Logging in to the SMTP server...")
-            server.login(smtp_username, smtp_password)
+
+            server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
             print(f"Sending email to {recipient_email}...")
-            server.sendmail(smtp_username, recipient_email, msg.as_string())
-            print(f"Email sent successfully to {recipient_email}")
+
+            server.sendmail(settings.EMAIL_HOST_USER, recipient_email, msg.as_string())
+            print("Email sent successfully.")
 
 
     except Exception as e:
