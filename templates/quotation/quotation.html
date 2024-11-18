@@ -262,25 +262,25 @@
         });
 
 
-        $('.item-description').select2({
-            placeholder: 'Search for an item',
-            minimumInputLength: 4,  // Trigger search after 4 characters
-            ajax: {
-                url: "{% url 'search_items' %}",  // URL for the search view
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        term: params.term  // Send the search term as a query parameter
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data  // Process results into Select2 format
-                    };
-                }
-            }
-        });
+        // $('.item-description').select2({
+        //     placeholder: 'Search for an item',
+        //     minimumInputLength: 4,  // Trigger search after 4 characters
+        //     ajax: {
+        //         url: "{% url 'search_items' %}",  // URL for the search view
+        //         dataType: 'json',
+        //         delay: 250,
+        //         data: function(params) {
+        //             return {
+        //                 term: params.term  // Send the search term as a query parameter
+        //             };
+        //         },
+        //         processResults: function(data) {
+        //             return {
+        //                 results: data  // Process results into Select2 format
+        //             };
+        //         }
+        //     }
+        // });
 
         // Event listener for selecting an item from the list
         $('.item-description').on('select2:select', function(e) {
@@ -290,7 +290,7 @@
             $("#item-price").prop("disabled",true);     // Populate the Price field
         });
 
-        
+        InitializeAllSelect2();
     });
 
     function DisplayQuotationDate(){
@@ -355,47 +355,52 @@
                     // Calculate and update the total amount
             calculateTotalAmount();
 
+            // Generate a unique ID
+            const uniqueId = `item-description-${Date.now()}`;
             var newRow = $('.default-row').first().clone();
 
             // Clear the input values in the cloned row
             clearRowInputs(newRow);
 
+            newRow.find('.select2').remove();
+            newRow.find('.item-description').remove();
+
             // Remove the Select2 container from the cloned row (if it exists)
-            newRow.find('#item-description').remove();  // Remove the Select2 wrapper
+            //newRow.find('#${uniqueId}').remove();  // Remove the Select2 wrapper
 
             // Append the new select element
             newRow.find('.col-lg-5').html(`
-                <select class="form-control-2 item-description" id="item-description" data-placeholder="Item Description" style="width: 100%;" required>
+                <select class="form-control-2 item-description" id="${uniqueId}" data-placeholder="Item Description" style="width: 100%;" required>
                 </select>
             `);
 
             // Initialize Select2 for the newly added select element in the cloned row
             // Initialize Select2 with AJAX inside the cloned row
-            newRow.find('#item-description').select2({
-            placeholder: 'Search for an item',
-            minimumInputLength: 4,  // Trigger search after 4 characters
-            ajax: {
-                url: "{% url 'search_items' %}",  // URL for the search view
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        term: params.term  // Send the search term as a query parameter
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data  // Process results into Select2 format
-                    };
+            newRow.find(`#${uniqueId}`).select2({
+                placeholder: 'Search for an item',
+                minimumInputLength: 4,  // Trigger search after 4 characters
+                ajax: {
+                    url: "{% url 'search_items' %}",  // URL for the search view
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            term: params.term  // Send the search term as a query parameter
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data  // Process results into Select2 format
+                        };
+                    }
                 }
-            }
             });
 
             // Event listener for selecting an item from the list in the cloned row
-            newRow.find('#item-description').on('select2:select', function(e) {
-            var data = e.params.data;
-            newRow.find('#item-quantity').val(data.quantity);  // Populate the Quantity field in the cloned row
-            newRow.find('#item-price').val(data.price);        // Populate the Price field in the cloned row
+            newRow.find(`#${uniqueId}`).on('select2:select', function(e) {
+                var data = e.params.data;
+                newRow.find('#item-quantity').val(data.quantity);  // Populate the Quantity field in the cloned row
+                newRow.find('#item-price').val(data.price);        // Populate the Price field in the cloned row
             });
             // newRow.find('select').val(null).trigger('change');  // Reset the select2 dropdown
 
@@ -404,6 +409,8 @@
 
             // Append the cloned row to #input-container (last position)
             $('#input-container').append(newRow);
+
+            InitializeAllSelect2();
         }
 
         // Initialize Select2 for the newly added row (only)
@@ -499,6 +506,37 @@ function PrintQuotation(){
             ErrorAlert("Failed to connect to the server.");
         }
     });
+}
+
+function InitializeAllSelect2() {
+    debugger;
+    // $('.item-description').each(function() {
+    //     if ($(this).data('select2')) {
+    //         $(this).select2('destroy'); // Destroy the existing Select2 instance
+    //     }
+    // });
+
+    // Reinitialize Select2 for all elements
+    $('.item-description').select2({
+        placeholder: 'Search for an item',
+        minimumInputLength: 4,
+        ajax: {
+            url: "{% url 'search_items' %}", // URL for the search view
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    term: params.term // Send the search term as a query parameter
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: data // Process results into Select2 format
+                };
+            }
+        }
+    });
+
 }
 
 

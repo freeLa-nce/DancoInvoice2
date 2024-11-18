@@ -179,7 +179,8 @@ def check_user_forget(request):
         email = ""
     if request.method == 'POST':
         email = request.POST.get('check-forgot-email')
-        
+        request.session['check-forgot-email'] = email
+
         # Find the user in the MongoDB collection
         user = users_collection.find_one({"UserName": email})
 
@@ -368,40 +369,42 @@ def send_otp_email(recipient_email, otp):
         subject = "Your OTP for Password Reset"
         body = f"Your OTP for password reset is: {otp}. Please use this to reset your password."
 
-        # smtp_server = config('SMTP_SERVER')
-        # smtp_port = config('SMTP_PORT', cast=int)
-        # smtp_username = config('SMTP_USERNAME')
-        # smtp_password = config('SMTP_PASSWORD')
-
         msg = MIMEText(body)
         print(msg)
         msg['Subject'] = subject
         msg['From'] = settings.EMAIL_HOST_USER
         print(msg['From'])
         msg['To'] = recipient_email
+        print(settings.EMAIL_PORT)
 
-        # print(smtp_username)
-        # print(smtp_password)
-        
-        # with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as server:
-        #     server.starttls()  # Secure the connection
+        print("____________")
+        if int(settings.EMAIL_PORT) == 587:
+            print("---------------------------------------------------")
+            server = smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
+            print(server)
+            print(server.starttls())  # Use STARTTLS for port 587
+        elif int(settings.EMAIL_PORT) == 465:
+            print("---------------------------------------------------")
+            server = smtplib.SMTP_SSL(settings.EMAIL_HOST, settings.EMAIL_PORT)  # Use SSL for port 465
+            print(server)
+        else:
+            raise ValueError("Unsupported SMTP port for secure connection.")
 
-        #     print("Logging in to the SMTP server...")
-        #     server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-        #     print(f"Sending email to {recipient_email}...")
-        #     server.sendmail(settings.EMAIL_HOST_USER, recipient_email, msg.as_string())
-        #     print(f"Email sent successfully to {recipient_email}")
         print(settings.EMAIL_HOST)
         print(settings.EMAIL_PORT)
-        with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as server:
-            server.starttls()  # Secure the connection
-            print("Logging in to the SMTP server...")
+        
+        print("######################################################")
+        print(server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD))
+        
+        print("######################################################")
+        print(server.sendmail(settings.EMAIL_HOST_USER, recipient_email, msg.as_string()))
 
-            server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-            print(f"Sending email to {recipient_email}...")
+        print(f"Sending email to {recipient_email}...")
 
-            server.sendmail(settings.EMAIL_HOST_USER, recipient_email, msg.as_string())
-            print("Email sent successfully.")
+        # server.sendmail(settings.EMAIL_HOST_USER, recipient_email, msg.as_string())
+        print("Email sent successfully.")
+        server.quit()
+
 
 
     except Exception as e:
@@ -422,6 +425,7 @@ def check_forgot_password_otp(request):
         email = request.session.get('check-forgot-email')
     else:
         email = ""
+    print(email)
     if request.method == 'POST' and email != "":
         # Combine all the code inputs into a single string to form the complete OTP
         otp_code = ''.join([request.POST.get(f'code{i}', '') for i in range(1, 7)])

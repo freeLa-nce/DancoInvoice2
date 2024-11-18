@@ -103,6 +103,7 @@ def get_product_by_id(request):
                 {"ProductId": product_id, "IsDeleted": 0},
                 {"_id": 0, "Productid": 1 ,"ProductId": 1, "ProductName": 1, "Quantity": 1, "UnitPrice": 1}  # Fields to return
             )
+            
 
             print(product)
             if product:

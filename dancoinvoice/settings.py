@@ -156,8 +156,9 @@ SECRET_KEY = config('SECRET_KEY')
 # Example: Fetching the SMTP configuration
 # Email configurations
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.getenv("SMTP_SERVER")
-EMAIL_PORT = int(os.getenv("SMTP_PORT", 587))
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = os.getenv("SMTP_PORT", 587)
 EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
 EMAIL_HOST_USER = os.getenv("SMTP_USERNAME")
 EMAIL_HOST_PASSWORD = os.getenv("SMTP_PASSWORD")

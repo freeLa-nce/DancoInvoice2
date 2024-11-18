@@ -34,10 +34,12 @@ def search_items(request):
         products = product_collection.find(
             {
             "ProductName": {"$regex": term, "$options": "i"},  # Case-insensitive search
-            "IsDeleted": 0  # Filter where IsDeleted is 0
+            "IsDeleted": 0,
+            "Quantity": {"$ne": 0}  # Filter where IsDeleted is 0
             },  # Case-insensitive search
             {"ProductId": 1, "ProductName": 1, "Quantity": 1, "UnitPrice": 1}  # Select only these fields
         ).limit(10)
+        
         
         print(products)
         # Format the results for the AJAX response
