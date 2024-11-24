@@ -9,13 +9,17 @@ from reportlab.pdfgen import canvas
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from datetime import datetime
+
+from Product.views import get_current_ist_time  # Import datetime class directly
 
 
 
 client = MongoClient(settings.MONGO_DB_URI)
 db = client.get_database()
 users_collection = db['users']
-product_collection = db['tbl_product'] 
+product_collection = db['tbl_product']
+quotation_collection = db['tbl_quotation']
 
 
 def quotation_view(request):
@@ -89,6 +93,67 @@ def update_product_quantity(request):
         return JsonResponse({'success': True})
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method'})
+    
+
+@csrf_exempt
+def save_quotation(request):
+    print("----------------------------------------------------------")
+    if request.method == 'POST':
+        print(request.POST)
+        data = json.loads(request.body)
+        print(data)
+        products = data.get('products', [])
+        totalAmount = data.get('totalAmount',0)
+        invoiceDate = data.get('invoiceDate',0)
+        userId = request.session.get('user_id')
+
+        try:
+            # Loop through each product to update its quantity in the collection
+            for product in products:
+                print(product)
+                product_name = product['name']
+                quantity = product['quantity']
+                amount = product['amount']
+                
+                # Get the next Productid automatically
+                last_quotation = quotation_collection.find_one(sort=[("Qutationid", -1)])  # Find the last inserted product
+                print(last_quotation)
+                new_quotation_id = last_quotation['Qutationid'] + 1 if last_quotation else 1  # Increment the Productid
+                print(new_quotation_id)
+
+                print("___________________________________________________________________")
+                # Create the product data to insert
+                quotation_data = {
+                    "Qutationid": new_quotation_id,
+                    "InvoiceDate": invoiceDate,
+                    "TotalAmount": totalAmount,
+                    "ProductName": product_name,
+                    "Quantity": quantity,
+                    "Amount": amount,
+                    "IsDeleted": 0,
+                    "CreatedBy": userId,
+                    "CreatedAt": get_current_ist_time(),  # Store in ISO format
+                    "UpdatedAt": None,
+                    "UpdatedBy": None,  # Set to the creator for now
+                }
+                print("-------------------------------------------------------")
+                print(quotation_data)
+
+                print("_______________________________________________")
+                # Insert the new product into the collection
+                print(quotation_collection.insert_one(quotation_data))
+                print("----------------------------------------------")
+
+                # Return success response
+                return JsonResponse({'message': 'Quotation created successfully', 'tags': 'success'})
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            # Handle any errors that occur
+            return JsonResponse({'message': 'Unable to create quotation!', 'tags': 'error'})
+
+    # If the request method is not POST, return an error response
+    return JsonResponse({'message': 'Unable to proccess request. Please Contact Administrator!', 'tags': 'error'})
 
 def generate_qr_code(request):
     # URL that the QR code will point to (handle QR scan at this endpoint)
