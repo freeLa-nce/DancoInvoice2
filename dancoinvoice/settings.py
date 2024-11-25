@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'QUOTATION',
     'Product',
     'CustomerData',
+    'InvoiceDelivery'
 ]
 
 MIDDLEWARE = [

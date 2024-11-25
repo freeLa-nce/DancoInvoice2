@@ -11,6 +11,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
     <style>
         .mb-0{
@@ -21,15 +22,12 @@
             margin-right: 0.5rem !important;
         }
     </style>
-</head>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
 
 <body>
 
     <div class="dashboard" id="dashboard">
         <nav class="navbar navbar-expand-lg bg-blue ">
-            <a class="navbar-brand pt-3" href="#">Navbar</a>
+            <a class="navbar-brand pt-3" href="{% url 'quotation' %}"><img src="{% static 'img/fav icon.png' %}" alt="" style="height: 40px;width: 40px;"></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -38,12 +36,12 @@
         <div class="collapse navbar-collapse pt-4" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-0">
                     <li class="nav-item active mx-4">
-                        <a class="nav-link active" href="quotation.html">
+                        <a class="nav-link active" href="{% url 'quotation' %}">
                             <i class="fas fa-file-invoice" style="margin-right: 8px;"></i> Quotation
                         </a>
                     </li>
                     <li class="nav-item mx-4">
-                        <a class="nav-link" href="{% url 'customer-view' %}">
+                        <a class="nav-link" href="{% url 'invoice-view' %}">
                             <i class="fas fa-ticket-alt" style="margin-right: 8px;"></i> Invoice & Delivery
                         </a>
                     </li>
@@ -77,7 +75,7 @@
             
                         <div class="dropdown-divider"></div>
             
-                        <a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt mr-2"></i> Logout</a>
+                        <a class="dropdown-item" href="{% url 'logout'%}"><i class="fas fa-sign-out-alt mr-2"></i> Logout</a>
                     </div>
                 </div>
 
@@ -92,14 +90,15 @@
                 
                 <div class="col-md-6" style="background-color: #fff;">
                     <div class="d-flex justify-content-between align-items-center my-4">
-                        <img src="{% static 'img/DANACO.png' %}" alt="Company Logo" class="logo">
+                        <img src="{% static 'img/ft black.png' %}" alt="Company Logo" alt="Company Logo" class="logo img-fluid"
+                        style="width: 240px; height: 80px;">
                         <img src="{% static 'img/qr.png' %}" alt="QR Code" class="qr-code mr-3" style="height: 150px;width: 150px;">
                     </div>
                     
                     <p>Cecilia Chapman<br>711-2880 Nulla St.<br>Mankato Mississippi<br>96522<br>(257) 563-7401</p>
                     <div class="form-group mb-2 d-flex justify-content-end align-items-center">
-                        <label for="invoice-date"class="mb-0 me-2">Quotation Date: </label>
-                        <input type="date" class="form-control w-50" id="invoice-date" placeholder="Date" onchange="DisplayQuotationDate();">
+                        <label for="quotation-date"class="mb-0 me-2">Quotation Date: </label>
+                        <input type="date" class="form-control w-50" id="quotation-date" placeholder="Date" onchange="DisplayQuotationDate();">
                     </div>
                     <div class="container-2 my-4" id="product-row-container" style="padding: 0px 40px 0px 40px; background-color: #F3F3F3;">
                         <div class="add-product-row">
@@ -152,13 +151,14 @@
                     
                     
                 
-                    <div id="invoice-preview" class="border p-3" style="width: 100%; height: 29.7cm; position: relative;">
+                    <div id="quotation-preview" class="border p-3" style="width: 100%; height: 29.7cm; position: relative;background-color: #fff;">
                         <div class="d-flex justify-content-between align-items-center">
-                            <img src="{% static 'img/DANACO.png' %}" alt="Company Logo" class="logo">
+                            <img src="{% static 'img/DANACO.png' %}" alt="Company Logo" alt="Company Logo" class="logo img-fluid"
+                            style="width: 240px; height: 80px;">
                             <img src="{% static 'img/qr.png' %}" alt="QR Code" class="qr-code mr-3" style="height: 150px;width: 150px;">
                         </div>
                         <p class="my-2">Cecilia Chapman<br>711-2880 Nulla St.<br>Mankato Mississippi 96522<br>(257) 563-7401</p>
-                        <p><strong>Date:</strong> <span id="display-invoice-date">--</span></p>
+                        <p><strong>Date:</strong> <span id="display-quotation-date">--</span></p>
                         <div class="table-responsive mb-1">
 
                         </div>
@@ -196,9 +196,6 @@
     <link rel="stylesheet" href="{% static 'css\libs\notiflix\notiflix.min.css' %}">
     <script src="{% static 'js\libs\notiflix\notiflix-3.2.7.min.js' %}"></script>
     <script src="{% static 'js\danco.js' %}"></script>
-    <!-- <script src="{% static 'js/script.js' %}"></script> -->
-
-    <!-- Add these lines in the <head> section of your template -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
@@ -261,27 +258,6 @@
             }
         });
 
-
-        // $('.item-description').select2({
-        //     placeholder: 'Search for an item',
-        //     minimumInputLength: 4,  // Trigger search after 4 characters
-        //     ajax: {
-        //         url: "{% url 'search_items' %}",  // URL for the search view
-        //         dataType: 'json',
-        //         delay: 250,
-        //         data: function(params) {
-        //             return {
-        //                 term: params.term  // Send the search term as a query parameter
-        //             };
-        //         },
-        //         processResults: function(data) {
-        //             return {
-        //                 results: data  // Process results into Select2 format
-        //             };
-        //         }
-        //     }
-        // });
-
         // Event listener for selecting an item from the list
         $('.item-description').on('select2:select', function(e) {
             var data = e.params.data;
@@ -296,6 +272,13 @@
                 .on('input', function () {
                     // Ensure entered value does not exceed maxQuantity
                     let currentVal = parseFloat($(this).val());
+
+                    // If the current value is 0, set it to 1 (or any valid value you prefer)
+                    if (currentVal === 0) {
+                        $(this).val(1); // You can set it to any other default value, e.g., 1
+                    }
+
+                    // If the current value exceeds the maximum, reset to max quantity
                     if (currentVal > maxQuantity) {
                         $(this).val(maxQuantity); // Reset to max if exceeded
                     }
@@ -304,19 +287,22 @@
             // Update and disable the Price field
             $('#item-price')
                 .val(price)                  // Set the price value
-                .prop('disabled', true);     // Make it non-editable
-                });
+                .prop('disabled', false)
+                .attr('readonly', true);
+                // Make it non-editable
+        });
+        
 
         InitializeAllSelect2();
     });
 
     function DisplayQuotationDate(){
-        const selectedDate = document.getElementById('invoice-date').value;
-        // document.getElementById('display-invoice-date').textContent = selectedDate;
+        const selectedDate = document.getElementById('quotation-date').value;
+        // document.getElementById('display-quotation-date').textContent = selectedDate;
         if (selectedDate) { // Check if a date is selected
             const [year, month, day] = selectedDate.split("-"); // Split the date into parts
             const formattedDate = `${day}-${month}-${year}`; // Rearrange to dd-mm-yyyy
-            document.getElementById('display-invoice-date').textContent = formattedDate;
+            document.getElementById('display-quotation-date').textContent = formattedDate;
         }
     }
 
@@ -432,10 +418,17 @@
                 newRow.find('#item-quantity')
                     .val(maxQuantity) // Set initial value
                     .prop('disabled', false)  // Ensure the field is not disabled
-                    .attr('max', maxQuantity) // Set max value attribute
+                    .attr('max', maxQuantity) // Set max value attribute                    
                     .on('input', function () {
-                        // Enforce max quantity
+                        // Enforce max quantity and ensure the value is not 0
                         let currentVal = parseFloat($(this).val());
+
+                        // If the current value is 0, set it to 1 (or any valid value you prefer)
+                        if (currentVal === 0) {
+                            $(this).val(1); // You can set it to any other default value, e.g., 1
+                        }
+
+                        // If the current value exceeds the maximum, reset to max quantity
                         if (currentVal > maxQuantity) {
                             $(this).val(maxQuantity); // Reset to max if exceeded
                         }
@@ -525,11 +518,11 @@ function calculateTotalAmount() {
 
 function PrintQuotation(){
 // Select the invoice section
-    var invoiceContent = document.getElementById("invoice-preview").innerHTML;
+    var invoiceContent = document.getElementById("quotation-preview").innerHTML;
 
     // Get total amount and invoice date
     let totalAmount = parseFloat($('#total-amount').text()); // Extract the total amount
-    let invoiceDate = $('#invoice-date').val(); // Extract the invoice date
+    let invoiceDate = $('#quotation-date').val(); // Extract the invoice date
     if(invoiceDate == ''){
         ErrorAlert("Please enter quotation date!");
         return;
@@ -563,24 +556,27 @@ function PrintQuotation(){
 
             // Check the tag and call the appropriate alert function
             if (messageTag.includes('success')) {
-                $.ajax({
-                    url: "{% url 'update-product-quantity' %}", // Server route for updating product quantity
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ products: productData }),
-                    success: function(response) { 
-                        if (response.success) {
-                            // Proceed to print after updating quantities
-                            $('#print-invoice').css('display', 'none');
-                            printInvoiceContent(invoiceContent);
-                        } else {
-                            ErrorAlert("Error updating product quantities. Please try again.");
-                        }
-                    },
-                    error: function() {
-                        ErrorAlert("Failed to connect to the server.");
-                    }
-                });
+                // Proceed to print after updating quantities
+                $('#print-invoice').css('display', 'none');
+                printInvoiceContent(invoiceContent);
+                // $.ajax({
+                //     url: "{% url 'update-product-quantity' %}", // Server route for updating product quantity
+                //     type: 'POST',
+                //     contentType: 'application/json',
+                //     data: JSON.stringify({ products: productData }),
+                //     success: function(response) { 
+                //         if (response.success) {
+                //             // Proceed to print after updating quantities
+                //             $('#print-invoice').css('display', 'none');
+                //             printInvoiceContent(invoiceContent);
+                //         } else {
+                //             ErrorAlert("Error updating product quantities. Please try again.");
+                //         }
+                //     },
+                //     error: function() {
+                //         ErrorAlert("Failed to connect to the server.");
+                //     }
+                // });
             } else if (messageTag.includes('error')) {
                 ErrorAlert(messageText);
             }

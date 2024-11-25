@@ -1,0 +1,774 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    <div class="dashboard" id="dashboard">
+        <nav class="navbar navbar-expand-lg bg-blue ">
+            <a class="navbar-brand pt-3" href="{% url 'invoice-view' %}"><img src="{% static 'img/fav icon.png' %}" alt="" style="height: 40px;width: 40px;"></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse pt-4" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-0">
+                    <li class="nav-item mx-4">
+                        <a class="nav-link" href="{% url 'quotation' %}">
+                            <i class="fas fa-file-invoice" style="margin-right: 8px;"></i> Quotation
+                        </a>
+                    </li>
+                    <li class="nav-item active mx-4">
+                        <a class="nav-link" href="{% url 'invoice-view' %}">
+                            <i class="fas fa-ticket-alt" style="margin-right: 8px;"></i> Invoice & Delivery
+                        </a>
+                    </li>
+                    <li class="nav-item mx-4">
+                        <a class="nav-link" href="{% url 'customer-view' %}">
+                            <i class="fas fa-user" style="margin-right: 8px;"></i> Customer Data
+                        </a>
+                    </li>
+                    <li class="nav-item mx-4">
+                        <a class="nav-link" href="{% url 'product_view' %}">
+                            <i class="fas fa-boxes" style="margin-right: 8px;"></i> Products
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Profile Dropdown -->
+                <div class="dropdown ml-auto">
+                    <a class="nav-link d-flex align-items-center" href="#" id="profileDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXJr-fGkiy1DE5A0JNOkcmCNGcXuQXdzENZA&s"
+                            alt="" class="rounded-circle" width="50" height="50">
+                        <div class="ml-1"> <!-- Adjusted margin for better spacing -->
+                            <span class="d-block font-weight-bold fs-2">Shehzad Khot</span>
+                            <span class="d-block text-muted">Technical Officer</span>
+                        </div>
+                    </a>
+
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+                        <a class="dropdown-item" href="#"><i class="fas fa-envelope mr-2"></i> Danaco@gmail.com</a>
+                        <a class="dropdown-item" href="{% url 'reset_view'%}"><i class="fas fa-key mr-2"></i> Reset Password</a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <a class="dropdown-item" href="{% url 'logout'%}"><i class="fas fa-sign-out-alt mr-2"></i> Logout</a>
+                    </div>
+                </div>
+
+            </div>
+        </nav>
+
+        <div class="container-fluid mt-4" id="dashboard-content">
+            <div class="row">
+                <div class="col-md-6" style="background-color: #ffffff; height: 22.7 cm;">
+                    <div class="row align-items-center my-4">
+                        <!-- Column for the company logo -->
+                        <div class="col-md-6">
+                            <img src="{% static 'img/ft black.png' %}" alt="Company Logo" class="logo img-fluid"
+                                style="width: 240px; height: 80px;">
+                        </div>
+
+                        <!-- Column for the invoice number -->
+                        <div class="col-md-6">
+                            <div class="d-flex flex-column">
+                                <label for="invoiceNo" class="form-label mb-1">Invoice No:</label>
+                                <input type="text" id="invoiceNo" class="form-control form-control-sm w-auto"
+                                    placeholder="Invoice Number">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row mb-4">
+                        <!-- Column for the static text -->
+                        <div class="col-md-6">
+                            <p>
+                                Cecilia Chapman<br>
+                                711-2880 Nulla St.<br>
+                                Mankato Mississippi<br>
+                                96522<br>
+                                (257) 563-7401
+                            </p>
+                        </div>
+
+                        <!-- Column for the recipient address as input fields -->
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <input type="text" class="form-control form-control-sm" id="recipient-name" placeholder="Recipient Name" oninput="DisplayRecipientName()">
+                            </div>
+                            <div class="mb-2">
+                                <input type="text" class="form-control form-control-sm" id="recipient-add" placeholder="Street Address" oninput="DisplayRecipientAdd()">
+                            </div>
+                            <div class="mb-2">
+                                <input type="text" class="form-control form-control-sm" id="recipient-phone" placeholder="Phone Number" oninput="DisplayRecipientPhone()">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group mb-2 d-flex justify-content-end align-items-center">
+                        <label for="invoice-date" class="mr-3">Invoice Date: </label>
+                        <input type="date" class="form-control w-50" id="invoice-date" placeholder="Date" onchange="DisplayInvoiceDate();">
+                    </div>
+
+                    <div class="container-2 mt-4" style="padding: 0px 40px 0px 40px; background-color: #F3F3F3;">
+                        <div class="add-invoice-product-row">
+                            <div id="input-invoice-container" class="mt-3">
+                                <div class="row mb-2 default-row">
+                                    <div class="col-lg-5 mb-2">
+                                        <h6>Item</h6>
+                                        <!-- <input type="text" class="form-control-2" placeholder="Item Description" required> -->
+                                        <select class="form-control-2 item-invoice-description" id="item-invoice-description" data-placeholder="Item Description" style="width: 100%;" required></select>
+                                        <div class="invalid-feedback">Please select an item.</div>
+                                    </div>
+                                    <div class="col-lg-3 mb-2">
+                                        <h6>Quantity</h6>
+                                        <input type="number" class="form-control-2" id="invoice-quantity" placeholder="Quantity" required>
+                                        <div class="invalid-feedback">Please enter quantity.</div>
+
+                                    </div>
+                                    <div class="col-lg-3 mb-2">
+                                        <h6>Amount</h6>
+                                        <input type="number" class="form-control-2" id="invoice-amount" placeholder="Price" required>
+                                        <div class="invalid-feedback">Please enter an amount.</div>
+
+                                    </div>
+                                    <div class="col-lg-1 mb-3 d-flex align-items-end">
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteInvoiceRow(this)">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <div class="row">
+                                <div class="col text-right">
+                                    <button type="button" class="btn btn-primary mt-2" id="add-invoice-row-btn" onclick="addInvoiceProductRow(this.parentNode.parentNode)">Add Row</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    
+                    <div id="invoice-preview" class="border p-4"
+                        style="width: 100%; height: 29.7cm; position: relative;">
+
+                        <div class="row align-items-center my-4">
+                            <!-- Column for the company logo -->
+                            <div class="col-md-6">
+                                <img src="{% static 'img/ft black.png' %}" alt="Company Logo" class="mb-4" style="height: 80px;width: 240px;"> 
+                            </div>
+
+                            <!-- Column for the invoice number -->
+                            <div class="col-md-6">
+                                <div class="d-flex flex-column">
+                                    <p><strong>Invoice No:</strong> <span id="display-invoice-no"></span></p>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="row mb-4">
+                            <!-- Column for company details -->
+                            <div class="col-md-6">
+                                <p id="preview-company-details">
+                                    Cecilia Chapman<br>711-2880 Nulla St.<br>Mankato Mississippi 96522<br>(257) 563-7401
+                                </p>
+                            </div>
+                            <!-- Column for recipient details -->
+                            <div class="col-md-6">
+                                <p><strong>Recipient:</strong><br>
+                                    <span id="display-recipient-name"></span><br>
+                                    <span id="display-recipient-address"></span><br>
+                                    <span id="display-recipient-phone"></span>
+                                </p>
+                            </div>
+                        </div>
+                        <p><strong>Date:</strong> <span id="display-invoice-date"></span></p>
+                        <table class="table table-bordered" id="invoice-delivery-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Item Description</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Total</th>
+                                </tr>
+                            </thead>
+                            <!-- <tbody id="invoice-table-body">
+                           
+                            </tbody> -->
+                        </table>
+                        <p style="text-align: end;"><strong>Total Amount:</strong> KWD <span id="total-invoice-amount"></span>
+                        </p>
+                        <div class="button-group" style="position: absolute; bottom: 20px; right: 20px;">
+                            <button class="btn btn-success" id="print-invoice" onclick="PrintInvoice()">Print Invoice</button>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://lottie.host/5da40bf1-867e-417e-ad44-1b63d4b82932/zn2Y8qg1M0.json"></script>
+    <script src="{% static 'js/quotation/quotation.js' %}"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'css\libs\notiflix\notiflix.min.css' %}">
+    <script src="{% static 'js\libs\notiflix\notiflix-3.2.7.min.js' %}"></script>
+    <script src="{% static 'js\danco.js' %}"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap4.css">
+
+    <script id="messages" type="application/json">
+        {{ messages|json_script:"messages" }}
+    </script>
+
+    <script id="invoiceId" type="application/json">
+        {{ invoice_number|json_script:"invoice_number" }}
+    </script>
+    
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap4.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            debugger;
+            // Get the content of the script tag by its ID
+            const scriptContent = document.getElementById('messages').textContent.trim();
+
+            const messages = extractMessagesFromContent(scriptContent);
+            // Parse the content as JSON
+            if(messages != "" || messages != []){
+            // Now process the messages and display them using Notiflix
+                messages.forEach(msg => {
+                    const messageText = msg.message;
+                    const messageTag = msg.tags;  // 'success', 'error', etc.
+    
+                    if(messageText == "Session expired, please log in again."){
+                        ErrorAlert(messageText);
+                        setTimeout(() => {
+                            window.location.href = '{% url "login" %}';
+                        }, 2000); // Adjust the delay as needed
+                    }
+                    if (messageTag.includes('success')) {
+                        SuccessAlert(messageText);
+                    } else if (messageTag.includes('error')) {
+                        ErrorAlert(messageText);
+                    } else if (messageTag.includes('warning')) {
+                        WarningAlert(messageText);
+                    } else {
+                        InfoAlert(messageText);
+                    }
+                });
+            }
+    
+            $('#invoice-delivery-table').DataTable({
+                data: [], // Empty data as no products are added initially
+                columns: [
+                    { title: "Item Description" },
+                    { title: "Quantity" },
+                    { title: "Price" },
+                    { title: "Total" }
+                ],
+                searching: false, // Disable searching
+                paging: false, // Disable pagination
+                destroy: true, // Destroy any previous instance before reinitialization
+                info: false,
+                language: {
+                    emptyTable: "No products added" // Display message when table is empty
+                }
+            });
+    
+            // Event listener for selecting an item from the list
+            $('.item-invoice-description').on('select2:select', function(e) {
+                var data = e.params.data;
+                // Populate the Quantity field in the cloned row
+                let maxQuantity = data.quantity;
+                let price = data.price;
+    
+                // Update and restrict Quantity field
+                $('#invoice-quantity')
+                    .val(maxQuantity)            // Set initial value
+                    .attr('max', maxQuantity)    // Set max attribute
+                    .on('input', function () {
+                        // Ensure entered value does not exceed maxQuantity
+                        let currentVal = parseFloat($(this).val());
+
+                        // If the current value is 0, set it to 1 (or any valid value you prefer)
+                        if (currentVal === 0) {
+                            $(this).val(1); // You can set it to any other default value, e.g., 1
+                        }
+
+                        // If the current value exceeds the maximum, reset to max quantity
+                        if (currentVal > maxQuantity) {
+                            $(this).val(maxQuantity); // Reset to max if exceeded
+                        }
+                    });
+    
+                // Update and disable the Price field
+                $('#invoice-amount')
+                    .val(price)                  // Set the price value
+                    .prop('disabled', true)
+                    .attr('readonly', true);
+                    // Make it non-editable
+            });
+    
+            InitializeAllInvoiceSelect2();
+            GetInvoiceNumber();
+        });
+
+    function GetInvoiceNumber(){
+        // Perform the first AJAX request to send these additional fields
+        $.ajax({
+            url: "{% url 'generate-invoice-number' %}", // Server route for generating invoice number
+            type: 'GET', // Adjusted to match the view's expected request method
+            success: function(response) {
+                if (response.invoice_number) {
+                    const invoiceNumber = response.invoice_number; // Extract the invoice number from the response
+                    // Example: Display the invoice number on the page
+                    $('#invoiceNo').val(invoiceNumber);
+                    $('#invoiceNo').prop('disabled',true)
+                    
+                    $('#display-invoice-no').text(invoiceNumber);
+
+                } else {
+                    ErrorAlert("Error generating the invoice number. Please contact adminstrator!");
+                }
+            },
+            error: function() {
+                ErrorAlert("Error generating the invoice number. Please contact adminstrator!");
+            }
+        });
+    }
+
+    function DisplayInvoiceDate(){
+        const selectedDate = document.getElementById('invoice-date').value;
+        if (selectedDate) { // Check if a date is selected
+            const [year, month, day] = selectedDate.split("-"); // Split the date into parts
+            const formattedDate = `${day}-${month}-${year}`; // Rearrange to dd-mm-yyyy
+            document.getElementById('display-invoice-date').textContent = formattedDate;
+        }
+    }
+
+    function DisplayRecipientName(){
+        const recipientName = document.getElementById('recipient-name').value;
+        if (recipientName) { // Check if a date is selected
+            document.getElementById('display-recipient-name').textContent = recipientName;
+        }
+    }
+
+
+    function DisplayRecipientAdd(){
+        const recipientAdd = document.getElementById('recipient-add').value;
+        if (recipientAdd) { // Check if a date is selected
+            document.getElementById('display-recipient-address').textContent = recipientAdd;
+        }
+    }
+
+    function DisplayRecipientPhone(){
+        const recipientPhone = document.getElementById('recipient-phone').value;
+        if (recipientPhone) { // Check if a date is selected
+            document.getElementById('display-recipient-phone').textContent = recipientPhone;
+        }
+    }
+
+    function InitializeAllInvoiceSelect2() {
+    // Reinitialize Select2 for all elements
+        $('.item-invoice-description').select2({
+            placeholder: 'Search for an item',
+            minimumInputLength: 4,
+            ajax: {
+                url: "{% url 'search_items' %}", // URL for the search view
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        term: params.term // Send the search term as a query parameter
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data // Process results into Select2 format
+                    };
+                }
+            }
+        });
+
+    }
+
+
+    function addInvoiceProductRow(button) {
+        debugger;
+        let isValid = true;
+
+        // Check if each required field has a value
+        $('.default-row input, .default-row select').each(function() {
+            if (!$(this).val()) {
+                $(this).addClass('is-invalid'); // Add Bootstrap's invalid class
+                isValid = false;
+            } else {
+                $(this).removeClass('is-invalid'); // Remove invalid class if value exists
+            }
+        });
+
+        if (isValid) {
+
+            let rowCount = $(button).closest('.add-invoice-product-row').find('.default-row').length;
+            console.log('Row count:', rowCount);
+
+            // Clear the existing table data
+            var table = $('#invoice-delivery-table').DataTable();
+            table.clear().draw(); // Clears the table
+
+            if (!$.fn.DataTable.isDataTable('#invoice-delivery-table')) {
+                table = $('#invoice-delivery-table').DataTable({
+                    destroy: true,
+                    searching: false,
+                    paging: true,
+                    lengthChange: false,
+                    info: false,
+                    pageLength: 5,
+                    scrollX: true,
+                });
+            } else {
+                table = $('#invoice-delivery-table').DataTable();
+            }
+
+            // Iterate over each .default-row and add data to the table
+            $(button).closest('.add-invoice-product-row').find('.default-row').each(function() {
+                // Extract data from each .default-row
+                debugger;
+                let row = $(this);
+                let itemDescription = row.find('.item-invoice-description option:selected').text();
+                let itemQuantity = parseFloat(row.find('input[id^="invoice-quantity"]').val()) || 0;
+                let itemPrice = parseFloat(row.find('input[id^="invoice-amount"]').val()) || 0;
+
+                let itemTotal = itemQuantity * itemPrice;
+
+                // Add data to the table
+                table.row.add([
+                    itemDescription,
+                    itemQuantity,
+                    itemPrice.toFixed(2),
+                    itemTotal.toFixed(2)
+                ]).draw();
+
+                // Disable inputs in the current row
+                row.find('input, select').attr('disabled', true);
+
+            });
+
+            // Optionally, calculate the total amount after adding the rows
+            calculateTotalInvoiceAmount();
+
+            // Generate a unique ID
+            const uniqueId = `item-invoice-description-${Date.now()}`;
+            var newRow = $('.default-row').first().clone();
+
+            // Clear the input values in the cloned row
+            clearInvoiceRowInputs(newRow);
+
+            newRow.find('.select2').remove();
+            newRow.find('.item-invoice-description').remove();
+            // Append the new select element
+            newRow.find('.col-lg-5').html(`
+                <h6>Item</h6>
+                <select class="form-control-2 item-invoice-description" id="${uniqueId}" data-placeholder="Item Description" style="width: 100%;" required>
+                </select>
+            `);
+
+            // Initialize Select2 for the newly added select element in the cloned row
+            // Initialize Select2 with AJAX inside the cloned row
+            newRow.find(`#${uniqueId}`).select2({
+                placeholder: 'Search for an item',
+                minimumInputLength: 4,  // Trigger search after 4 characters
+                ajax: {
+                    url: "{% url 'search_items' %}",  // URL for the search view
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            term: params.term  // Send the search term as a query parameter
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data  // Process results into Select2 format
+                        };
+                    }
+                }
+            });
+
+            // Event listener for selecting an item from the list in the cloned row
+            newRow.find(`#${uniqueId}`).on('select2:select', function(e) {
+                var data = e.params.data;
+                // Populate the Quantity field in the cloned row
+                let maxQuantity = data.quantity;
+                let price = data.price;
+
+                newRow.find('#invoice-quantity')
+                    .val(maxQuantity) // Set initial value
+                    .prop('disabled', false)  // Ensure the field is not disabled
+                    .attr('max', maxQuantity) // Set max value attribute                    
+                    .on('input', function () {
+                        // Enforce max quantity and ensure the value is not 0
+                        let currentVal = parseFloat($(this).val());
+
+                        // If the current value is 0, set it to 1 (or any valid value you prefer)
+                        if (currentVal === 0) {
+                            $(this).val(1); // You can set it to any other default value, e.g., 1
+                        }
+
+                        // If the current value exceeds the maximum, reset to max quantity
+                        if (currentVal > maxQuantity) {
+                            $(this).val(maxQuantity); // Reset to max if exceeded
+                        }
+                    });
+
+                newRow.find('#invoice-amount')
+                    .val(price)
+                    .prop('disabled', false)  // Ensure the field is not disabled
+                    .attr('readonly', true);            
+            });
+
+            // Enable the delete button for the cloned row
+            enableInvoiceDeleteButton(newRow);
+
+            // Append the cloned row to #input-container (last position)
+            $('#input-invoice-container').append(newRow);
+
+            InitializeAllInvoiceSelect2();
+        }
+
+    }
+
+    // Function to clear input fields in a row
+    function clearInvoiceRowInputs(row) {
+        row.find('input').val('');  // Clear the input fields
+        row.find('select').val(null).trigger('change');  // Reset Select2 field (if used)
+    }
+
+    // Function to enable the delete button for a cloned row
+    function enableInvoiceDeleteButton(row) {
+        row.find('.btn-danger').prop('disabled', false);  // Enable the delete button
+    }   
+
+    // Function to delete a row
+    function deleteInvoiceRow(button) {
+        debugger;
+        let table = $('#invoice-delivery-table').DataTable();
+        let rowContainer = $(button).closest('.default-row');
+
+        // Extract relevant data (e.g., item description, quantity, price) to identify the table row
+        let itemDescription = rowContainer.find('.item-invoice-description option:selected').text();
+        let itemQuantity = parseFloat(rowContainer.find('input[id^="invoice-quantity"]').val()) || 0;
+        let itemPrice = parseFloat(rowContainer.find('input[id^="invoice-amount"]').val()) || 0;
+        let itemTotal = itemQuantity * itemPrice;
+
+        // Iterate over DataTable rows to find a matching row
+        table.rows().every(function() {
+            let data = this.data(); // Get row data as an array
+            if (
+                data[0] === itemDescription &&
+                data[1] === itemQuantity &&
+                parseFloat(data[2]).toFixed(2) === itemPrice.toFixed(2) &&
+                parseFloat(data[3]).toFixed(2) === itemTotal.toFixed(2)
+            ) {
+                this.remove(); // Remove the matching row from DataTable
+            }
+        });
+
+        // Redraw the DataTable to reflect the changes
+        table.draw();
+
+        // Remove the `.default-row` from the DOM
+        rowContainer.remove();
+
+        // Recalculate the total amount if needed
+        calculateTotalInvoiceAmount();
+    }
+
+    
+
+// Function to calculate the total amount
+function calculateTotalInvoiceAmount() {
+    let totalAmount = 0;
+
+    // Iterate over each row in the DataTable
+    $('#invoice-delivery-table').DataTable().rows().every(function() {
+        let data = this.data();
+        let rowTotal = parseFloat(data[3]); // Assuming 'Total' is in the fourth column
+        if (!isNaN(rowTotal)) {
+            totalAmount += rowTotal;
+        }
+    });
+
+    // Update the total amount display
+    $('#total-invoice-amount').text(totalAmount.toFixed(2));
+}
+
+
+
+function PrintInvoice(){
+    // Select the invoice section
+    var invoiceContent = document.getElementById("invoice-preview").innerHTML;
+
+    var invoiceNo = $("#invoiceNo").val();
+    // Get total amount and invoice date
+    let totalAmount = parseFloat($('#total-invoice-amount').text()); // Extract the total amount
+    let invoiceDate = $('#invoice-date').val(); // Extract the invoice date
+    if(invoiceDate == ''){
+        ErrorAlert("Please enter invoice date!");
+        return;
+    }
+
+    let reciepentName = $('#recipient-name').val(); // Extract the invoice date
+    if(reciepentName == ''){
+        ErrorAlert("Please enter invoice name!");
+        return;
+    }
+
+    let reciepentAdd = $('#recipient-add').val(); // Extract the invoice date
+    if(reciepentAdd == ''){
+        ErrorAlert("Please enter invoice address!");
+        return;
+    }
+
+    let reciepentPhone = $('#recipient-phone').val(); // Extract the invoice date
+    if(reciepentPhone == ''){
+        ErrorAlert("Please enter invoice phone!");
+        return;
+    }
+    // Collect product data from the table
+    let productData = [];
+    $('#invoice-delivery-table').DataTable().rows().every(function() {
+        let data = this.data();
+        let productName = data[0];   // Assuming the product name is in the first column
+        let productQuantity = parseInt(data[1]); // Assuming the quantity is in the second column
+        let productAmount = parseInt(data[2]);
+        if (!isNaN(productQuantity)) {
+            productData.push({ name: productName, quantity: productQuantity, amount: productAmount});
+        }
+    });
+
+    
+    // Perform the first AJAX request to send these additional fields
+    $.ajax({
+        url: "{% url 'save-invoice' %}", // Server route for saving invoice details
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            invoice_number: invoiceNo,
+            total_amount: totalAmount,
+            invoice_date: invoiceDate,
+            recipient_name: reciepentName,
+            recipient_add: reciepentAdd,
+            recipient_phone: reciepentPhone,
+
+            products: productData
+        }),
+        success: function(response) {
+            const messageText = response.message; // Extracting message
+            const messageTag = response.tags; // Extracting tags
+
+            // Check the tag and call the appropriate alert function
+            if (messageTag.includes('success')) {
+                // Proceed to print after updating quantities
+                $('#print-invoice').css('display', 'none');
+                printDInvoiceContent(invoiceContent);
+                // $.ajax({
+                //     url: "{% url 'update-product-quantity' %}", // Server route for updating product quantity
+                //     type: 'POST',
+                //     contentType: 'application/json',
+                //     data: JSON.stringify({ products: productData }),
+                //     success: function(response) { 
+                //         if (response.success) {
+                //             // Proceed to print after updating quantities
+                //             $('#print-invoice').css('display', 'none');
+                //             printInvoiceContent(invoiceContent);
+                //         } else {
+                //             ErrorAlert("Error updating product quantities. Please try again.");
+                //         }
+                //     },
+                //     error: function() {
+                //         ErrorAlert("Failed to connect to the server.");
+                //     }
+                // });
+            } else if (messageTag.includes('error')) {
+                ErrorAlert(messageText);
+            }
+            else {
+                ErrorAlert("Error saving quotation details. Please try again.");
+            }
+        },
+        error: function() {
+            ErrorAlert("Failed to connect to the server for saving qotation details.");
+        }
+    });
+}
+
+// Function to open the print window and print the content
+function printDInvoiceContent(invoiceContent) {
+    var printWindow = window.open('', '', 'height=600,width=800');
+    // Open the document for writing
+    printWindow.document.open();
+// Write the HTML content
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Print Invoice</title>
+                <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+                <style>@media print { body { margin: 0; } }</style>
+            </head>
+            <body>${invoiceContent}</body>
+        </html>
+    `);
+
+    // Close the document writing
+    printWindow.document.close();
+
+    // Print the document once it has fully loaded
+    printWindow.onload = function () {
+        try {
+            printWindow.print();
+        } catch (error) {
+            console.error('Error during print:', error);
+        } finally {
+            printWindow.close();
+            $('#print-invoice').css('display', 'block');
+            location.reload();
+        }
+    };
+}
+</script>    
+
+</body>
+
+</html>

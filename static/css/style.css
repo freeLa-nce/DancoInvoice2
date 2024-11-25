@@ -44,7 +44,7 @@ a {
 }
 
 .blue-btn {
-    background-color: #4361BF;
+    background-color: #48B4B8;
     border: none;
     color: #fff;
     width: 100%;
@@ -126,7 +126,7 @@ form {
 }
 
 .overlay {
-    background: #4361BF;
+    background: #48B4B8;
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -166,7 +166,7 @@ form {
 
 /* Button Styles */
 .btn.blue-btn {
-    background-color: #4361BF;
+    background-color: #48B4B8;
     border: none;
     color: #fff;
     width: 100%;
@@ -263,7 +263,7 @@ input:invalid ~ .invalid-feedback {
 
 #resend-code-btn {
     font-size: 1rem;
-    color: #4361BF;
+    color: #48B4B8;
     background: none;
     border: none;
     padding: 0;
@@ -277,7 +277,7 @@ input:invalid ~ .invalid-feedback {
 
 .bg-blue{
     background-color: #ffffff;
-    color: #4361BF;
+    color: #48B4B8;
 }
 .navbar {
     height: 80px;
@@ -303,18 +303,18 @@ input:invalid ~ .invalid-feedback {
     margin-top: 10px;
 }
 .nav-item .nav-link {
-    color: #4361BF;
+    color: #48B4B8;
     display: flex;
     align-items: center;
     margin-top: 16px;
 }
 
 .nav-item .nav-link i {
-    color: #4361BF;
+    color: #48B4B8;
 }
 
 .nav-item.active .nav-link {
-    background-color: #4361BF;
+    background-color: #48B4B8;
     color: white;
     border-radius: 4px;
     margin-top: 18px;
@@ -385,7 +385,7 @@ input:invalid ~ .invalid-feedback {
 }
 
 .table thead th {
-    background-color: #4361BF;
+    background-color: #48B4B8;
     color: #fff;
 }
 
@@ -402,7 +402,7 @@ input:invalid ~ .invalid-feedback {
 }
 
 .btn-primary {
-    background-color: #4361BF;
+    background-color: #48B4B8;
     border: none;
     padding: 8px 12px;
     color: #fff;
@@ -492,7 +492,7 @@ input:invalid ~ .invalid-feedback {
         border: 1px solid #5e5a5a !important;
     }
     table th {
-        background-color: #4361BF !important;
+        background-color: #48B4B8 !important;
         color: #ffffff !important;
     }
     @page {

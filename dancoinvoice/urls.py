@@ -22,4 +22,5 @@ urlpatterns = [
     path('quotation/', include('QUOTATION.urls')),
     path('product/', include('Product.urls')),
     path('customer/', include('CustomerData.urls')),
+    path('invoice/', include('InvoiceDelivery.urls'))
 ]
