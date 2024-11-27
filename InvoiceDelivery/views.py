@@ -108,9 +108,10 @@ def save_invoice(request):
                 print("----------------------------------------------")
 
 
-                last_customer = invoice_collection.find_one(sort=[("CustomerId", -1)])  # Find the last inserted product
+                print("############################################################")
+                last_customer = customer_collection.find_one(sort=[("CustomerId", -1)])  # Find the last inserted product
                 print(last_customer)
-                new_customer_id = last_invoice['CustomerId'] + 1 if last_invoice else 1  # Increment the Productid
+                new_customer_id = last_invoice['CustomerId'] + 1 if last_customer else 1  # Increment the Productid
                 print(new_customer_id)
 
 

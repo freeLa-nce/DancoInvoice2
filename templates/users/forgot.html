@@ -21,7 +21,7 @@
                 <form action ="{% url 'checkUserForgot' %}" id="check-user-forgot-form" method="POST">
 
                     {% csrf_token %}  <!-- Add CSRF Token for security -->
-                    <img src="{% static 'img/DANACO.png' %}" alt="" class="mb-4">
+                    <img src="{% static 'img/ft black.png' %}" alt="" class="mb-4" style="width: 240px;height: 70px;">
                     <div class="form-group mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" id="check-forgot-email" name="check-forgot-email" class="form-control mb-2" placeholder="Enter your email" />
