@@ -277,7 +277,11 @@
             processData: false,  // Prevent jQuery from processing the data
             contentType: false,  
             success: function(response) {
-                
+                debugger;
+                if (response.tags === "Error") 
+                {
+                    ErrorAlert(response.message);
+                }
             },
             error: function() {
                 ErrorAlert('An error occurred. Please try again after sometime.');

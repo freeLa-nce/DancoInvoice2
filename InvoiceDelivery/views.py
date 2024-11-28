@@ -13,6 +13,8 @@ from datetime import datetime
 import random
 import string
 from Product.views import get_current_ist_time  # Import datetime class directly
+from django.views.decorators.http import require_POST
+
 
 
 
@@ -159,3 +161,48 @@ def save_invoice(request):
 
     # If the request method is not POST, return an error response
     return JsonResponse({'message': 'Unable to proccess request. Please Contact Administrator!', 'tags': 'error'})
+
+
+
+
+def edit_invoice(request):
+    if request.method == 'POST':
+        try:
+            # Extract 'invoiceNumber' from POST data
+            invoice_number = request.POST.get('invoiceNumber')
+            if not invoice_number:
+                return JsonResponse({'message': 'Its look like there is an issue with system. Please contact administrator!','tags': 'error'})
+
+
+            # MongoDB query to find all matching documents and sort
+            last_customer = customer_collection.find_one(
+                {
+                    "InvoiceNumber": invoice_number,  # Match the provided invoice number
+                    "isDeleted": 0                    # Ensure the document is not marked as deleted
+                },
+                sort=[("CustomerId", DESCENDING)]  # Sort by CustomerId in descending order
+            )
+            print(last_customer)
+
+            # If you want to retrieve all matching documents (not just the last one)
+            all_customers = list(customer_collection.find(
+                {
+                    "InvoiceNumber": invoice_number,
+                    "isDeleted": 0
+                }
+            ).sort("CustomerId", DESCENDING))
+
+            print(all_customers)
+
+            # If everything goes well, return a success response
+            return JsonResponse({
+                'message': 'Invoice edited successfully',
+                'tags': 'success'
+            })
+
+        except Exception as e:
+            # In case of any error, return an error response
+            return JsonResponse({
+                'message': str(e),
+                'tags': 'error'
+            })
