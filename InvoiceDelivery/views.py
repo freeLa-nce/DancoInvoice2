@@ -43,6 +43,14 @@ def invoice_view(request):
     })
 
 
+def convert_to_date(date_string, format="%Y-%m-%d"):
+    try:
+        return datetime.strptime(date_string, format)
+    except ValueError as e:
+        print(f"Error converting date: {e}")
+        return None
+
+
 @csrf_exempt
 def get_invoice_number(request):
     if request.method == 'GET':
@@ -63,7 +71,7 @@ def save_invoice(request):
         recipientPhone = data.get('recipient_phone',0)
         invoiceNumber = data.get('invoice_number',0)
 
-        invoiceDate = data.get('invoiceDate',0)
+        invoiceDate = data.get('invoice_date',0)
         userId = request.session.get('user_id')
 
         try:
@@ -80,6 +88,8 @@ def save_invoice(request):
                 new_invoice_id = last_invoice['InvoiceId'] + 1 if last_invoice else 1  # Increment the Productid
                 print(new_invoice_id)
 
+                invoice_date = convert_to_date(invoiceDate)
+
                 print("___________________________________________________________________")
                 # Create the product data to insert
                 invoice_data = {
@@ -88,7 +98,7 @@ def save_invoice(request):
                     "CustomerName": recieptName,
                     "CustomerAdd": recieptAdd,
                     "CustomerPhone": recipientPhone,
-                    "InvoiceDate": invoiceDate,
+                    "InvoiceDate": invoice_date,
                     "TotalAmount": totalAmount,
                     "ProductName": product_name,
                     "Quantity": quantity,
@@ -111,7 +121,7 @@ def save_invoice(request):
                 print("############################################################")
                 last_customer = customer_collection.find_one(sort=[("CustomerId", -1)])  # Find the last inserted product
                 print(last_customer)
-                new_customer_id = last_invoice['CustomerId'] + 1 if last_customer else 1  # Increment the Productid
+                new_customer_id = last_customer['CustomerId'] + 1 if last_customer else 1  # Increment the Productid
                 print(new_customer_id)
 
 
@@ -122,7 +132,7 @@ def save_invoice(request):
                     "CustomerName": recieptName,
                     "Address": recieptAdd,
                     "PhoneNumber": recipientPhone,
-                    "InvoiceDate": invoiceDate,
+                    "InvoiceDate": invoice_date,
                     "ProductName": product_name,
                     "Quantity": quantity,
                     "IsDeleted": 0,
@@ -138,6 +148,7 @@ def save_invoice(request):
                 print("_______________________________________________")
                 # Insert the new product into the collection
                 print(customer_collection.insert_one(customer_data))
+
                 # Return success response
                 return JsonResponse({'message': 'Invoice created successfully', 'tags': 'success'})
 

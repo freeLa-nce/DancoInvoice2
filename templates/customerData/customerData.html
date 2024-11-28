@@ -44,12 +44,12 @@
                             <i class="fas fa-ticket-alt" style="margin-right: 8px;"></i> Invoice & Delivery
                         </a>
                     </li>
-                    <li class="nav-item mx-4">
+                    <li class="nav-item active  mx-4">
                         <a class="nav-link" href="{% url 'customer-view' %}">
                             <i class="fas fa-user" style="margin-right: 8px;"></i> Customer Data
                         </a>
                     </li>
-                    <li class="nav-item active mx-4">
+                    <li class="nav-item mx-4">
                         <a class="nav-link" href="{% url 'product_view' %}">
                             <i class="fas fa-boxes" style="margin-right: 8px;"></i> Products
                         </a>
@@ -215,13 +215,13 @@
                             }
                         },
                         {'data': 'PhoneNumber'},
+                        {'data': 'Quantity' },
                         {
                             'data': 'InvoiceDate',
                             render: function (data, type, row) {
                                 return moment(data).format('DD-MM-YYYY');
                             }
                         },
-                        {'data': 'Quantity' },
                         {
                             'data': 'Amount',
                             'render': function(data, type, row) {
@@ -231,7 +231,7 @@
                         {
                             'render': function(data,type,row){
                                 return `<div class="action-btn-group">
-                                        <button class="btn btn-outline-info action-btn me-2" onclick="editProduct(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Product" ><i class="fa-solid fa-pen-to-square" style="color: #74C0FC;"></i></button>
+                                        <button class="btn btn-outline-info action-btn me-2" onclick="editCustomer('${row.InvoiceNumber}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Product" ><i class="fa-solid fa-pen-to-square" style="color: #74C0FC;"></i></button>
                                         <button class="btn btn-outline-danger action-btn me-2" id="delete-customer" onclick="DeleteCustomer(this)"  data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Product"><i class="fa-solid fa-trash" style="color: #f55f2e;"></i></button>
                                     </div>`;
                             }
@@ -258,6 +258,32 @@
     //     ErrorAlert(response)
 
     // }
+
+
+    function editCustomer(invoiceNumber) {
+        // console.log("Edit Customer for Invoice Number:", invoiceNumber);
+        // Add logic for editing customer data using the invoice number
+
+        var formData = new FormData();
+        var customerInvoiceNumber = invoiceNumber; 
+        formData.append('invoiceNumber', customerInvoiceNumber);
+        $.ajax({
+            url: "{% url 'edit-invoice' %}",
+            type: 'POST',
+            data: formData,
+            headers: {
+                'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()  // Include CSRF token in the header
+            },
+            processData: false,  // Prevent jQuery from processing the data
+            contentType: false,  
+            success: function(response) {
+                
+            },
+            error: function() {
+                ErrorAlert('An error occurred. Please try again after sometime.');
+            }
+        });
+    }
 
     function DeleteCustomer(element){
         ConfirmationAlert(function () {DeleteCustomerSucess(element); }, "Are you sure you want to delete"); 
