@@ -166,6 +166,8 @@ def save_invoice(request):
 
 
 def edit_invoice(request):
+    print("####################################################################################")
+    print("----------------------------------------------------------------------------------")
     if request.method == 'POST':
         try:
             # Extract 'invoiceNumber' from POST data
@@ -179,9 +181,9 @@ def edit_invoice(request):
                 {
                     "InvoiceNumber": invoice_number,  # Match the provided invoice number
                     "isDeleted": 0                    # Ensure the document is not marked as deleted
-                },
-                sort=[("CustomerId", DESCENDING)]  # Sort by CustomerId in descending order
+                }
             )
+
             print(last_customer)
 
             # If you want to retrieve all matching documents (not just the last one)
@@ -190,7 +192,7 @@ def edit_invoice(request):
                     "InvoiceNumber": invoice_number,
                     "isDeleted": 0
                 }
-            ).sort("CustomerId", DESCENDING))
+            ))
 
             print(all_customers)
 
