@@ -263,14 +263,13 @@
     function editCustomer(invoiceNumber) {
         // console.log("Edit Customer for Invoice Number:", invoiceNumber);
         // Add logic for editing customer data using the invoice number
-
-        var formData = new FormData();
+        debugger
         var customerInvoiceNumber = invoiceNumber; 
-        formData.append('invoiceNumber', customerInvoiceNumber);
+        var formData = { invoiceNumber: invoiceNumber };
         $.ajax({
             url: "{% url 'edit-invoice' %}",
             type: 'POST',
-            data: formData,
+            data: JSON.stringify(formData),
             headers: {
                 'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()  // Include CSRF token in the header
             },

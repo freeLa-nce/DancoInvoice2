@@ -164,13 +164,15 @@ def save_invoice(request):
 
 
 
+@csrf_exempt  # If using CSRF tokens, this might not be needed.
 
 def edit_invoice(request):
     print("####################################################################################")
     print("----------------------------------------------------------------------------------")
+    print(request.POST)
     if request.method == 'POST':
         try:
-            # Extract 'invoiceNumber' from POST data
+            # Extract 'invoiceNumber' from POST data 
             invoice_number = request.POST.get('invoiceNumber')
             if not invoice_number:
                 return JsonResponse({'message': 'Its look like there is an issue with system. Please contact administrator!','tags': 'error'})

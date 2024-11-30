@@ -87,7 +87,8 @@ DATABASES = {
         'ENGINE': 'djongo',
         'NAME': 'danco',
         'CLIENT': {
-            'host': 'mongodb://127.0.0.1:27017/?directConnection=true'  # MongoDB connection string
+            #'host': 'mongodb://127.0.0.1:27017/?directConnection=true'  # MongoDB connection string
+            'host': 'mongodb+srv://danco_database_uk:danco_database_uk@cluster0.9whol.mongodb.net/'  # MongoDB connection string
         }
      }
 }
